@@ -1,0 +1,52 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-lineas_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-lineas_pass}
+      POSTGRES_DB: ${POSTGRES_DB:-lineas_db}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-lineas_user}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-lineas_user}:${POSTGRES_PASSWORD:-lineas_pass}@db:5432/${POSTGRES_DB:-lineas_db}
+      JWT_SECRET: ${JWT_SECRET:-change_this_secret_in_production_min_32_chars}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-24h}
+      PORT: 4000
+      NODE_ENV: production
+      UPLOAD_DIR: /app/uploads
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:3000}
+    volumes:
+      - uploads_data:/app/uploads
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        INTERNAL_API_URL: http://backend:4000
+    restart: unless-stopped
+    depends_on:
+      - backend
+    environment:
+      INTERNAL_API_URL: http://backend:4000
+    ports:
+      - "3000:3000"
+
+volumes:
+  postgres_data:
+  uploads_data:

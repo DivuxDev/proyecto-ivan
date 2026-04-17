@@ -1,0 +1,72 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  WORKER
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      Role     @default(WORKER)
+  active    Boolean  @default(true)
+  phone     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  photos       Photo[]
+  activityLogs ActivityLog[]
+
+  @@index([email])
+  @@index([role])
+  @@index([active])
+}
+
+model Photo {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  filename  String
+  url       String
+  mimetype  String   @default("image/jpeg")
+  sizeBytes Int?
+
+  // Geolocalización
+  latitude  Float?
+  longitude Float?
+  altitude  Float?
+
+  // Metadatos
+  notes   String?
+  takenAt DateTime? // Fecha de captura (EXIF o cliente)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([createdAt])
+  @@index([latitude, longitude])
+}
+
+model ActivityLog {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  action    String   // login, upload, etc.
+  resource  String?  // photo_id, user_id, etc.
+  metadata  Json?
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([createdAt])
+}
