@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -21,25 +21,25 @@ import {
 import type { User } from '@/types';
 
 const createSchema = z.object({
-  name: z.string().min(2, 'MÃ­nimo 2 caracteres'),
-  email: z.string().email('Email invÃ¡lido'),
-  password: z.string().min(6, 'MÃ­nimo 6 caracteres'),
+  name: z.string().min(2, 'Mínimo 2 caracteres'),
+  email: z.string().email('Email inválido'),
+  password: z.string().min(6, 'Mínimo 6 caracteres'),
   role: z.enum(['ADMIN', 'WORKER']),
   phone: z.string().optional(),
 });
 
 const editSchema = z.object({
-  name: z.string().min(2, 'MÃ­nimo 2 caracteres'),
-  email: z.string().email('Email invÃ¡lido'),
+  name: z.string().min(2, 'Mínimo 2 caracteres'),
+  email: z.string().email('Email inválido'),
   role: z.enum(['ADMIN', 'WORKER']),
   phone: z.string().optional(),
 });
 
 const passwordSchema = z.object({
-  newPassword: z.string().min(6, 'MÃ­nimo 6 caracteres'),
-  confirmPassword: z.string().min(6, 'MÃ­nimo 6 caracteres'),
+  newPassword: z.string().min(6, 'Mínimo 6 caracteres'),
+  confirmPassword: z.string().min(6, 'Mínimo 6 caracteres'),
 }).refine(d => d.newPassword === d.confirmPassword, {
-  message: 'Las contraseÃ±as no coinciden',
+  message: 'Las contraseñas no coinciden',
   path: ['confirmPassword'],
 });
 
@@ -157,7 +157,7 @@ export default function UsersPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-8">
         <div>
           <h1 className="font-display text-2xl sm:text-3xl font-bold text-white mb-1">Trabajadores</h1>
-          <p className="text-navy-300 text-sm">GestiÃ³n de usuarios y accesos</p>
+          <p className="text-navy-300 text-sm">Gestión de usuarios y accesos</p>
         </div>
         <button
           onClick={() => { setShowCreate(true); setFormError(''); reset(); }}
@@ -264,7 +264,7 @@ export default function UsersPage() {
                         <button
                           onClick={() => openPassword(user)}
                           className="p-1.5 text-navy-300 hover:text-brand-400 hover:bg-brand-500/10 rounded-lg transition-colors"
-                          title="Cambiar contraseÃ±a"
+                          title="Cambiar contraseña"
                         >
                           <KeyRound className="w-3.5 h-3.5" />
                         </button>
@@ -285,7 +285,7 @@ export default function UsersPage() {
         </div>
       </div>
 
-      {/* Modal â€” Crear usuario */}
+      {/* Modal �?" Crear usuario */}
       {showCreate && (
         <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4">
           <div className="bg-navy-700 border border-navy-500 rounded-2xl p-6 w-full max-w-md animate-slide-up">
@@ -312,8 +312,8 @@ export default function UsersPage() {
                   {errors.email && <p className="text-xs text-red-400 mt-1">{errors.email.message}</p>}
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-navy-200 mb-1">ContraseÃ±a</label>
-                  <input {...register('password')} type="password" className="input-dark w-full" placeholder="MÃ­nimo 6 chars" />
+                  <label className="block text-xs font-medium text-navy-200 mb-1">Contraseña</label>
+                  <input {...register('password')} type="password" className="input-dark w-full" placeholder="Mínimo 6 chars" />
                   {errors.password && <p className="text-xs text-red-400 mt-1">{errors.password.message}</p>}
                 </div>
                 <div>
@@ -324,7 +324,7 @@ export default function UsersPage() {
                   </select>
                 </div>
                 <div className="col-span-2">
-                  <label className="block text-xs font-medium text-navy-200 mb-1">TelÃ©fono (opcional)</label>
+                  <label className="block text-xs font-medium text-navy-200 mb-1">Teléfono (opcional)</label>
                   <input {...register('phone')} type="tel" className="input-dark w-full" placeholder="+34 666 000 000" />
                 </div>
               </div>
@@ -356,7 +356,7 @@ export default function UsersPage() {
         </div>
       )}
 
-      {/* Modal â€” Editar usuario */}
+      {/* Modal �?" Editar usuario */}
       {editUser && (
         <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4">
           <div className="bg-navy-700 border border-navy-500 rounded-2xl p-6 w-full max-w-md animate-slide-up">
@@ -390,7 +390,7 @@ export default function UsersPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-navy-200 mb-1">TelÃ©fono</label>
+                  <label className="block text-xs font-medium text-navy-200 mb-1">Teléfono</label>
                   <input {...registerEdit('phone')} type="tel" className="input-dark w-full" placeholder="+34 666 000 000" />
                 </div>
               </div>
@@ -422,12 +422,12 @@ export default function UsersPage() {
         </div>
       )}
 
-      {/* Modal â€” Cambiar contraseÃ±a */}
+      {/* Modal �?" Cambiar contraseña */}
       {passwordUser && (
         <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4">
           <div className="bg-navy-700 border border-navy-500 rounded-2xl p-6 w-full max-w-sm animate-slide-up">
             <div className="flex items-center justify-between mb-2">
-              <h3 className="font-semibold text-white text-lg">Cambiar contraseÃ±a</h3>
+              <h3 className="font-semibold text-white text-lg">Cambiar contraseña</h3>
               <button onClick={() => setPasswordUser(null)} className="text-navy-300 hover:text-white">
                 <X className="w-5 h-5" />
               </button>
@@ -441,22 +441,22 @@ export default function UsersPage() {
               className="space-y-4"
             >
               <div>
-                <label className="block text-xs font-medium text-navy-200 mb-1">Nueva contraseÃ±a</label>
+                <label className="block text-xs font-medium text-navy-200 mb-1">Nueva contraseña</label>
                 <input
                   {...registerPwd('newPassword')}
                   type="password"
                   className="input-dark w-full"
-                  placeholder="MÃ­nimo 6 caracteres"
+                  placeholder="Mínimo 6 caracteres"
                 />
                 {pwdErrors.newPassword && <p className="text-xs text-red-400 mt-1">{pwdErrors.newPassword.message}</p>}
               </div>
               <div>
-                <label className="block text-xs font-medium text-navy-200 mb-1">Confirmar contraseÃ±a</label>
+                <label className="block text-xs font-medium text-navy-200 mb-1">Confirmar contraseña</label>
                 <input
                   {...registerPwd('confirmPassword')}
                   type="password"
                   className="input-dark w-full"
-                  placeholder="Repetir contraseÃ±a"
+                  placeholder="Repetir contraseña"
                 />
                 {pwdErrors.confirmPassword && <p className="text-xs text-red-400 mt-1">{pwdErrors.confirmPassword.message}</p>}
               </div>
@@ -480,7 +480,7 @@ export default function UsersPage() {
                   disabled={passwordMutation.isPending}
                   className="flex-1 bg-brand-500 hover:bg-brand-600 text-white py-2.5 rounded-xl text-sm font-medium transition-colors disabled:opacity-60"
                 >
-                  {passwordMutation.isPending ? 'Guardando...' : 'Cambiar contraseÃ±a'}
+                  {passwordMutation.isPending ? 'Guardando...' : 'Cambiar contraseña'}
                 </button>
               </div>
             </form>
@@ -488,7 +488,7 @@ export default function UsersPage() {
         </div>
       )}
 
-      {/* Modal â€” Confirmar eliminaciÃ³n */}
+      {/* Modal �?" Confirmar eliminación */}
       {deleteUser && (
         <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4">
           <div className="bg-navy-700 border border-navy-500 rounded-2xl p-6 w-full max-w-sm animate-slide-up">
@@ -499,8 +499,8 @@ export default function UsersPage() {
               <div>
                 <h3 className="font-semibold text-white mb-1">Desactivar usuario</h3>
                 <p className="text-navy-300 text-sm">
-                  Â¿Desactivar a <strong className="text-white">{deleteUser.name}</strong>?
-                  Sus fotos se mantendrÃ¡n.
+                  ¿Desactivar a <strong className="text-white">{deleteUser.name}</strong>?
+                  Sus fotos se mantendrán.
                 </p>
               </div>
             </div>

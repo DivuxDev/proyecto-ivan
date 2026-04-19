@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState, useRef, useCallback } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
@@ -149,31 +149,31 @@ export default function UploadPage() {
 
       <div className="px-4 py-5 space-y-4 max-w-lg mx-auto">
 
-        {/* â”€â”€ Zona de selecciÃ³n o grid de fotos â”€â”€ */}
+        {/* �"?�"? Zona de selección o grid de fotos �"?�"? */}
         {items.length === 0 ? (
           <div className="space-y-3">
-            {/* BotÃ³n cÃ¡mara */}
+            {/* Botón cámara */}
             <button
               onClick={() => cameraInputRef.current?.click()}
               className="w-full bg-brand-500 text-white rounded-2xl py-5 flex flex-col items-center gap-2 active:scale-[0.98] transition-transform shadow-amber-glow"
             >
               <Camera className="w-8 h-8" />
-              <span className="font-semibold text-base">Usar cÃ¡mara</span>
+              <span className="font-semibold text-base">Usar cámara</span>
               <span className="text-brand-100 text-xs">Captura una foto ahora</span>
             </button>
 
-            {/* BotÃ³n galerÃ­a */}
+            {/* Botón galería */}
             <button
               onClick={() => fileInputRef.current?.click()}
               className="w-full bg-white border-2 border-dashed border-gray-200 text-gray-600 rounded-2xl py-5 flex flex-col items-center gap-2 active:scale-[0.98] transition-transform"
             >
               <FileImage className="w-7 h-7 text-gray-400" />
-              <span className="font-medium text-sm">Seleccionar de galerÃ­a</span>
+              <span className="font-medium text-sm">Seleccionar de galería</span>
               <span className="text-gray-400 text-xs">Puedes elegir varias fotos a la vez</span>
             </button>
           </div>
         ) : (
-          /* â”€â”€ Grid de previews â”€â”€ */
+          /* �"?�"? Grid de previews �"?�"? */
           <div>
             <div className="grid grid-cols-3 gap-2">
               {items.map(item => (
@@ -204,7 +204,7 @@ export default function UploadPage() {
                       )}
                     </div>
                   )}
-                  {/* Eliminar (solo si no estÃ¡ subiendo ni exitoso) */}
+                  {/* Eliminar (solo si no está subiendo ni exitoso) */}
                   {item.status !== 'uploading' && item.status !== 'success' && (
                     <button
                       onClick={() => removeItem(item.id)}
@@ -216,7 +216,7 @@ export default function UploadPage() {
                 </div>
               ))}
 
-              {/* AÃ±adir mÃ¡s (solo si no estÃ¡ subiendo) */}
+              {/* Añadir más (solo si no está subiendo) */}
               {!isUploading && !allDone && (
                 <>
                   <button
@@ -224,14 +224,14 @@ export default function UploadPage() {
                     className="aspect-square rounded-xl border-2 border-dashed border-gray-200 flex flex-col items-center justify-center gap-1.5 text-gray-400 active:scale-[0.97] transition-transform"
                   >
                     <Camera className="w-5 h-5" />
-                    <span className="text-[10px] font-medium">CÃ¡mara</span>
+                    <span className="text-[10px] font-medium">Cámara</span>
                   </button>
                   <button
                     onClick={() => fileInputRef.current?.click()}
                     className="aspect-square rounded-xl border-2 border-dashed border-gray-200 flex flex-col items-center justify-center gap-1.5 text-gray-400 active:scale-[0.97] transition-transform"
                   >
                     <Plus className="w-5 h-5" />
-                    <span className="text-[10px] font-medium">AÃ±adir</span>
+                    <span className="text-[10px] font-medium">Añadir</span>
                   </button>
                 </>
               )}
@@ -239,7 +239,7 @@ export default function UploadPage() {
 
             {errorCount > 0 && !isUploading && (
               <p className="text-xs text-red-500 mt-2">
-                {errorCount} foto{errorCount !== 1 ? 's' : ''} con error â€” se reintentarÃ¡n al pulsar Subir.
+                {errorCount} foto{errorCount !== 1 ? 's' : ''} con error �?" se reintentarán al pulsar Subir.
               </p>
             )}
           </div>
@@ -263,7 +263,7 @@ export default function UploadPage() {
           className="hidden"
         />
 
-        {/* Estado de geolocalizaciÃ³n */}
+        {/* Estado de geolocalización */}
         <div
           className={`rounded-xl p-3.5 flex items-center justify-between ${
             position
@@ -282,22 +282,22 @@ export default function UploadPage() {
             <div>
               <p className={`text-sm font-medium ${position ? 'text-green-800' : 'text-gray-700'}`}>
                 {position
-                  ? 'UbicaciÃ³n capturada'
+                  ? 'Ubicación capturada'
                   : geoLoading
-                  ? 'Obteniendo ubicaciÃ³n...'
+                  ? 'Obteniendo ubicación...'
                   : geoError
-                  ? 'UbicaciÃ³n no disponible'
-                  : 'Sin ubicaciÃ³n GPS'}
+                  ? 'Ubicación no disponible'
+                  : 'Sin ubicación GPS'}
               </p>
               {position && (
                 <p className="text-xs text-green-600 mt-0.5">
-                  {position.latitude.toFixed(4)}Â°, {position.longitude.toFixed(4)}Â°
-                  {' '}(Â±{Math.round(position.accuracy)}m)
+                  {position.latitude.toFixed(4)}°, {position.longitude.toFixed(4)}°
+                  {' '}(±{Math.round(position.accuracy)}m)
                 </p>
               )}
               {geoError && (
                 <p className="text-xs text-red-500 mt-0.5">
-                  {geoError.includes('EXIF') ? geoError : `${geoError} Las coordenadas del EXIF de la foto se usarÃ¡n si estÃ¡n disponibles.`}
+                  {geoError.includes('EXIF') ? geoError : `${geoError} Las coordenadas del EXIF de la foto se usarán si están disponibles.`}
                 </p>
               )}
             </div>
@@ -320,7 +320,7 @@ export default function UploadPage() {
         {items.length > 0 && (
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1.5">
-              Notas (opcional{items.length > 1 ? ' â€” se aplican a todas las fotos' : ''})
+              Notas (opcional{items.length > 1 ? ' �?" se aplican a todas las fotos' : ''})
             </label>
             <textarea
               value={notes}
@@ -334,17 +334,17 @@ export default function UploadPage() {
           </div>
         )}
 
-        {/* Mensaje de Ã©xito total */}
+        {/* Mensaje de éxito total */}
         {allDone && (
           <div className="flex items-center gap-2.5 bg-green-50 border border-green-200 rounded-xl p-3.5 animate-slide-up">
             <CheckCircle2 className="w-5 h-5 text-green-600 shrink-0" />
             <p className="text-green-800 text-sm font-medium">
-              Â¡Todas las fotos subidas correctamente!
+              ¡Todas las fotos subidas correctamente!
             </p>
           </div>
         )}
 
-        {/* BotÃ³n de subida */}
+        {/* Botón de subida */}
         {items.length > 0 && (
           <button
             onClick={handleUploadAll}
@@ -354,7 +354,7 @@ export default function UploadPage() {
             {allDone ? (
               <>
                 <CheckCircle2 className="w-5 h-5 text-green-400" />
-                <span>Â¡Completado!</span>
+                <span>¡Completado!</span>
               </>
             ) : isUploading ? (
               <>
