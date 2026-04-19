@@ -34,5 +34,5 @@ EXPOSE 4000
 HEALTHCHECK --interval=30s --timeout=10s --start-period=45s --retries=3 \
   CMD curl -f http://localhost:4000/health || exit 1
 
-# Ejecutar migraciones y arrancar servidor
-CMD ["sh", "-c", "npx prisma migrate deploy && node dist/server.js"]
+# Sincronizar esquema y arrancar servidor
+CMD ["sh", "-c", "npx prisma db push --accept-data-loss && node dist/server.js"]
