@@ -50,6 +50,16 @@ model Photo {
   notes   String?
   takenAt DateTime? // Fecha de captura (EXIF o cliente)
 
+  // EXIF extendido (OpenCamera y otras cámaras)
+  gpsSpeed     Float?  // velocidad GPS (km/h)
+  gpsBearing   Float?  // orientación GPS (grados 0-360)
+  exifMake     String? // fabricante cámara
+  exifModel    String? // modelo cámara
+  exifIso      Int?    // sensibilidad ISO
+  exifAperture Float?  // apertura f/número
+  exifShutter  Float?  // velocidad obturación (segundos)
+  exifFocalLen Float?  // distancia focal (mm)
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

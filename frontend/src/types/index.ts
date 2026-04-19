@@ -22,8 +22,17 @@ export interface Photo {
   latitude?: number | null;
   longitude?: number | null;
   altitude?: number | null;
+  gpsSpeed?: number | null;
+  gpsBearing?: number | null;
   notes?: string | null;
   takenAt?: string | null;
+  // EXIF de cámara (OpenCamera)
+  exifMake?: string | null;
+  exifModel?: string | null;
+  exifIso?: number | null;
+  exifAperture?: number | null;
+  exifShutter?: number | null;
+  exifFocalLen?: number | null;
   createdAt: string;
 }
 

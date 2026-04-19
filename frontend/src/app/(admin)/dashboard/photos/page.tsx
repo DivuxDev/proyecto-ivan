@@ -20,6 +20,9 @@ import {
   Hash,
   ChevronRight,
   ExternalLink,
+  Camera,
+  Gauge,
+  Navigation,
 } from 'lucide-react';
 import Image from 'next/image';
 import type { Photo, PaginatedPhotos, User, WorkerStats } from '@/types';
@@ -412,6 +415,20 @@ export default function PhotosPage() {
                         value={`${selectedPhoto.altitude.toFixed(1)} m`}
                       />
                     )}
+                    {selectedPhoto.gpsSpeed != null && (
+                      <MetaRow
+                        icon={<Gauge className="w-3.5 h-3.5 text-navy-400" />}
+                        label="Velocidad"
+                        value={`${selectedPhoto.gpsSpeed.toFixed(1)} km/h`}
+                      />
+                    )}
+                    {selectedPhoto.gpsBearing != null && (
+                      <MetaRow
+                        icon={<Navigation className="w-3.5 h-3.5 text-navy-400" />}
+                        label="Orientación"
+                        value={`${selectedPhoto.gpsBearing.toFixed(1)}°`}
+                      />
+                    )}
                     <a
                       href={`https://www.google.com/maps?q=${selectedPhoto.latitude},${selectedPhoto.longitude}`}
                       target="_blank"
@@ -427,6 +444,48 @@ export default function PhotosPage() {
                   <div className="admin-card !p-4">
                     <p className="text-xs font-semibold text-navy-300 uppercase tracking-wider mb-2">Ubicación GPS</p>
                     <p className="text-navy-500 text-sm">Sin datos GPS</p>
+                  </div>
+                )}
+
+                {/* Cámara EXIF */}
+                {(selectedPhoto.exifMake || selectedPhoto.exifModel || selectedPhoto.exifIso != null) && (
+                  <div className="admin-card !p-4 space-y-2.5">
+                    <p className="text-xs font-semibold text-navy-300 uppercase tracking-wider mb-2">Cámara</p>
+                    {(selectedPhoto.exifMake || selectedPhoto.exifModel) && (
+                      <MetaRow
+                        icon={<Camera className="w-3.5 h-3.5 text-navy-400" />}
+                        label="Modelo"
+                        value={[selectedPhoto.exifMake, selectedPhoto.exifModel].filter(Boolean).join(' ')}
+                      />
+                    )}
+                    {selectedPhoto.exifIso != null && (
+                      <MetaRow
+                        icon={<Hash className="w-3.5 h-3.5 text-navy-400" />}
+                        label="ISO"
+                        value={String(selectedPhoto.exifIso)}
+                      />
+                    )}
+                    {selectedPhoto.exifAperture != null && (
+                      <MetaRow
+                        icon={<Hash className="w-3.5 h-3.5 text-navy-400" />}
+                        label="Apertura"
+                        value={`f/${selectedPhoto.exifAperture.toFixed(1)}`}
+                      />
+                    )}
+                    {selectedPhoto.exifShutter != null && (
+                      <MetaRow
+                        icon={<Clock className="w-3.5 h-3.5 text-navy-400" />}
+                        label="Velocidad obturación"
+                        value={formatShutter(selectedPhoto.exifShutter)}
+                      />
+                    )}
+                    {selectedPhoto.exifFocalLen != null && (
+                      <MetaRow
+                        icon={<Hash className="w-3.5 h-3.5 text-navy-400" />}
+                        label="Focal"
+                        value={`${selectedPhoto.exifFocalLen.toFixed(1)} mm`}
+                      />
+                    )}
                   </div>
                 )}
 
@@ -499,6 +558,13 @@ export default function PhotosPage() {
       )}
     </div>
   );
+}
+
+/* ── Velocidad de obturación legible ────────────────────────────────────── */
+function formatShutter(seconds: number): string {
+  if (seconds >= 1) return `${seconds.toFixed(1)}s`;
+  const denominator = Math.round(1 / seconds);
+  return `1/${denominator}s`;
 }
 
 /* ── Componente auxiliar MetaRow ──────────────────────────────────────── */

@@ -5,12 +5,20 @@ export interface PhotoMetadata {
   latitude?: number;
   longitude?: number;
   altitude?: number;
+  gpsSpeed?: number;    // km/h
+  gpsBearing?: number;  // grados (0-360)
   takenAt?: Date;
+  exifMake?: string;    // fabricante cámara
+  exifModel?: string;   // modelo cámara
+  exifIso?: number;     // ISO
+  exifAperture?: number; // f/número
+  exifShutter?: number;  // segundos (ej. 0.001 = 1/1000s)
+  exifFocalLen?: number; // mm
 }
 
 /**
- * Extrae metadatos GPS y fecha de una imagen usando datos EXIF.
- * Si no hay datos EXIF, retorna un objeto vacío (best-effort).
+ * Extrae metadatos GPS y EXIF completos de una imagen.
+ * Optimizado para fotos de OpenCamera que incluye campos extendidos.
  */
 export async function extractExifData(filePath: string): Promise<PhotoMetadata> {
   try {
@@ -19,6 +27,7 @@ export async function extractExifData(filePath: string): Promise<PhotoMetadata> 
       tiff: true,
       exif: true,
       translateValues: true,
+      translateKeys: true,
     });
 
     if (!exif) return {};
@@ -30,18 +39,33 @@ export async function extractExifData(filePath: string): Promise<PhotoMetadata> 
       result.latitude = exif.latitude;
       result.longitude = exif.longitude;
     }
-    if (exif.altitude != null) {
-      result.altitude = exif.altitude;
+    if (exif.altitude != null) result.altitude = exif.altitude;
+    if (exif.GPSSpeed != null) {
+      // GPSSpeed en EXIF es km/h si GPSSpeedRef='K', millas si 'M', nudos si 'N'
+      const ref = exif.GPSSpeedRef || 'K';
+      let speed = exif.GPSSpeed;
+      if (ref === 'M') speed *= 1.60934;  // millas → km
+      else if (ref === 'N') speed *= 1.852; // nudos → km
+      result.gpsSpeed = Math.round(speed * 10) / 10;
     }
+    if (exif.GPSImgDirection != null) result.gpsBearing = exif.GPSImgDirection;
 
     // Fecha de captura
     const dateSource = exif.DateTimeOriginal || exif.DateTime || exif.CreateDate;
     if (dateSource) {
       const parsed = new Date(dateSource);
-      if (!isNaN(parsed.getTime())) {
-        result.takenAt = parsed;
-      }
+      if (!isNaN(parsed.getTime())) result.takenAt = parsed;
     }
+
+    // Cámara
+    if (exif.Make) result.exifMake = String(exif.Make).trim();
+    if (exif.Model) result.exifModel = String(exif.Model).trim();
+
+    // Exposición
+    if (exif.ISO != null) result.exifIso = Number(exif.ISO);
+    if (exif.FNumber != null) result.exifAperture = exif.FNumber;
+    if (exif.ExposureTime != null) result.exifShutter = exif.ExposureTime;
+    if (exif.FocalLength != null) result.exifFocalLen = exif.FocalLength;
 
     return result;
   } catch (err) {
