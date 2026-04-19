@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import type { MapPhoto } from '@/types';
+import { getPhotoSrc } from '@/lib/utils';
 
 interface Props {
   photos: MapPhoto[];
@@ -61,7 +62,7 @@ export default function PhotoMap({ photos }: Props) {
       const marker = L.marker([photo.latitude, photo.longitude], { icon: amberIcon })
         .bindPopup(`
           <div style="min-width:160px;font-family:sans-serif;">
-            ${photo.url ? `<img src="${photo.url}" style="width:100%;height:100px;object-fit:cover;border-radius:6px;margin-bottom:6px;" />` : ''}
+            ${photo.url ? `<img src="${getPhotoSrc(photo.url)}" style="width:100%;height:100px;object-fit:cover;border-radius:6px;margin-bottom:6px;" />` : ''}
             <p style="font-weight:600;color:#1E293B;margin:0 0 2px;">${photo.user.name}</p>
             <p style="color:#64748B;font-size:11px;margin:0;">${(() => { const d = new Date(photo.takenAt || photo.createdAt); return isNaN(d.getTime()) ? '—' : d.toLocaleDateString('es-ES'); })()}</p>
             ${photo.notes ? `<p style="color:#475569;font-size:12px;margin:4px 0 0;">${photo.notes}</p>` : ''}
@@ -120,7 +121,7 @@ export default function PhotoMap({ photos }: Props) {
       const marker = L.marker([photo.latitude, photo.longitude], { icon: amberIcon })
         .bindPopup(`
           <div style="min-width:160px;font-family:sans-serif;">
-            ${photo.url ? `<img src="${photo.url}" style="width:100%;height:100px;object-fit:cover;border-radius:6px;margin-bottom:6px;" />` : ''}
+            ${photo.url ? `<img src="${getPhotoSrc(photo.url)}" style="width:100%;height:100px;object-fit:cover;border-radius:6px;margin-bottom:6px;" />` : ''}
             <p style="font-weight:600;color:#1E293B;margin:0 0 2px;">${photo.user.name}</p>
             <p style="color:#64748B;font-size:11px;margin:0;">${(() => { const d = new Date(photo.takenAt || photo.createdAt); return isNaN(d.getTime()) ? '—' : d.toLocaleDateString('es-ES'); })()}</p>
             ${photo.notes ? `<p style="color:#475569;font-size:12px;margin:4px 0 0;">${photo.notes}</p>` : ''}
