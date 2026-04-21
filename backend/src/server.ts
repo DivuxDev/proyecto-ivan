@@ -10,7 +10,7 @@ async function main() {
 
   const server = app.listen(PORT, () => {
     console.log('');
-    console.log('⚡ LineasCampo API arrancada');
+    console.log('⚡ TagMap API arrancada');
     console.log(`   🚀 http://localhost:${PORT}`);
     console.log(`   📁 Imágenes: http://localhost:${PORT}/uploads`);
     console.log(`   🩺 Health: http://localhost:${PORT}/health`);

@@ -3,13 +3,13 @@ services:
     image: postgres:16-alpine
     restart: unless-stopped
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:-lineas_user}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-lineas_pass}
-      POSTGRES_DB: ${POSTGRES_DB:-lineas_db}
+      POSTGRES_USER: ${POSTGRES_USER:-tagmap_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-tagmap_pass}
+      POSTGRES_DB: ${POSTGRES_DB:-tagmap_db}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-lineas_user} -d ${POSTGRES_DB:-lineas_db}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-tagmap_user} -d ${POSTGRES_DB:-tagmap_db}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -23,7 +23,7 @@ services:
       db:
         condition: service_healthy
     environment:
-      DATABASE_URL: postgresql://${POSTGRES_USER:-lineas_user}:${POSTGRES_PASSWORD:-lineas_pass}@db:5432/${POSTGRES_DB:-lineas_db}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-tagmap_user}:${POSTGRES_PASSWORD:-tagmap_pass}@db:5432/${POSTGRES_DB:-tagmap_db}
       JWT_SECRET: ${JWT_SECRET:-change_this_secret_in_production_min_32_chars}
       JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-24h}
       PORT: 4000

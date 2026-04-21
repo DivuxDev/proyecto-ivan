@@ -1,5 +1,5 @@
 {
-  "name": "lineas-backend",
+  "name": "tagmap-backend",
   "version": "1.0.0",
   "description": "API backend para gestión de trabajos de campo - líneas eléctricas",
   "main": "dist/server.js",

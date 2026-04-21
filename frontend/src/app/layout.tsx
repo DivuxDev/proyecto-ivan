@@ -3,9 +3,9 @@ import './globals.css';
 import { QueryProvider } from './providers';
 
 export const metadata: Metadata = {
-  title: 'LineasCampo',
-  description: 'Gestión de trabajos de campo para empresas de líneas eléctricas',
-  applicationName: 'LineasCampo',
+  title: 'TagMap',
+  description: 'Gestión de trabajos de campo geolocalizados',
+  applicationName: 'TagMap',
 };
 
 export const viewport: Viewport = {

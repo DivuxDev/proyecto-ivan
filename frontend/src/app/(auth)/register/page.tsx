@@ -57,7 +57,7 @@ export default function RegisterPage() {
             <Zap className="w-6 h-6 text-white fill-white" />
           </div>
           <span className="font-display text-2xl font-bold text-white tracking-wide">
-            LINEAS<span className="text-brand-500">CAMPO</span>
+            TAG<span className="text-brand-500">MAP</span>
           </span>
         </div>
 

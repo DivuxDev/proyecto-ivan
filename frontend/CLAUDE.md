@@ -1,6 +1,6 @@
 # CLAUDE.md — frontend
 
-Next.js 14 App Router + TypeScript + Tailwind CSS para LineasCampo.
+Next.js 14 App Router + TypeScript + Tailwind CSS para TagMap.
 
 ---
 

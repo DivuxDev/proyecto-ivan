@@ -65,7 +65,7 @@ export default function LoginPage() {
             </div>
             <div>
               <h1 className="font-display text-2xl font-bold text-white tracking-wide">
-                LINEAS<span className="text-brand-500">CAMPO</span>
+                TAG<span className="text-brand-500">MAP</span>
               </h1>
               <p className="text-navy-300 text-xs tracking-widest uppercase">
                 Gestión de campo

@@ -41,7 +41,7 @@ export default function AdminSidebar() {
           </div>
           <div>
             <p className="font-display text-base font-bold text-white tracking-wide">
-              LINEAS<span className="text-brand-500">CAMPO</span>
+              TAG<span className="text-brand-500">MAP</span>
             </p>
             <p className="text-navy-400 text-[10px] tracking-widest uppercase">Admin Panel</p>
           </div>

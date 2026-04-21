@@ -1,6 +1,6 @@
 # CLAUDE.md — backend
 
-API REST en Express + TypeScript + Prisma para LineasCampo.
+API REST en Express + TypeScript + Prisma para TagMap.
 
 ---
 
@@ -117,7 +117,7 @@ El handler global en `error.middleware.ts` formatea la respuesta como `{ success
 ## Variables de entorno
 
 ```env
-DATABASE_URL=postgresql://user:pass@localhost:5432/lineas
+DATABASE_URL=postgresql://user:pass@localhost:5432/tagmap
 JWT_SECRET=<mínimo 32 chars aleatorios>
 JWT_EXPIRES_IN=24h
 UPLOAD_DIR=./uploads
@@ -133,7 +133,7 @@ CORS_ORIGIN=http://localhost:3000
 ```bash
 npm run db:migrate:dev -- --name descripcion   # nueva migración (dev)
 npm run db:migrate                             # aplicar en producción
-npm run db:seed                                # admin@lineas.com / Admin1234!
+npm run db:seed                                # admin@tagmap.app / Admin1234!
 npm run db:studio                              # Prisma Studio en :5555
 npm run db:reset                               # nuclear: borra todo + re-seed (⚠️)
 ```

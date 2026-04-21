@@ -11,11 +11,11 @@ async function main() {
 
   // Administrador
   const admin = await prisma.user.upsert({
-    where: { email: 'admin@lineas.com' },
+    where: { email: 'admin@tagmap.app' },
     update: {},
     create: {
       name: 'Administrador',
-      email: 'admin@lineas.com',
+      email: 'admin@tagmap.app',
       password: adminPassword,
       role: Role.ADMIN,
     },
@@ -23,11 +23,11 @@ async function main() {
 
   // Trabajadores de ejemplo
   const workerData = [
-    { name: 'Carlos García', email: 'carlos@lineas.com', phone: '+34 666 111 222' },
-    { name: 'Pedro López', email: 'pedro@lineas.com', phone: '+34 666 333 444' },
-    { name: 'María Rodríguez', email: 'maria@lineas.com', phone: '+34 666 555 666' },
-    { name: 'Antonio Martínez', email: 'antonio@lineas.com', phone: '+34 666 777 888' },
-    { name: 'Juan Sánchez', email: 'juan@lineas.com', phone: '+34 666 999 000' },
+    { name: 'Carlos García', email: 'carlos@tagmap.app', phone: '+34 666 111 222' },
+    { name: 'Pedro López', email: 'pedro@tagmap.app', phone: '+34 666 333 444' },
+    { name: 'María Rodríguez', email: 'maria@tagmap.app', phone: '+34 666 555 666' },
+    { name: 'Antonio Martínez', email: 'antonio@tagmap.app', phone: '+34 666 777 888' },
+    { name: 'Juan Sánchez', email: 'juan@tagmap.app', phone: '+34 666 999 000' },
   ];
 
   const workers = await Promise.all(
@@ -41,7 +41,7 @@ async function main() {
   );
 
   console.log('✅ Seed completado:');
-  console.log(`   👤 Admin: admin@lineas.com / admin123`);
+  console.log(`   👤 Admin: admin@tagmap.app / admin123`);
   console.log(`   👷 Trabajadores (pass: worker123):`);
   workers.forEach(w => console.log(`      - ${w.email}`));
   console.log('');

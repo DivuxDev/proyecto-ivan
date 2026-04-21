@@ -46,7 +46,7 @@ export default function WorkerHomePage() {
               <Zap className="w-5 h-5 text-white fill-white" />
             </div>
             <span className="font-display text-base font-bold text-white tracking-wide">
-              LINEAS<span className="text-brand-500">CAMPO</span>
+              TAG<span className="text-brand-500">MAP</span>
             </span>
           </div>
           <button

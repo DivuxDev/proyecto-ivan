@@ -39,7 +39,7 @@ export const useAuthStore = create<AuthStore>()(
         })),
     }),
     {
-      name: 'lineas-auth',
+      name: 'tagmap-auth',
       storage: createJSONStorage(() =>
         typeof window !== 'undefined' ? localStorage : sessionStorage
       ),

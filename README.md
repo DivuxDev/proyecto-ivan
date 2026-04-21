@@ -1,4 +1,4 @@
-# LineasCampo — Gestión de Trabajos de Campo
+# TagMap — Gestión de Trabajos de Campo
 
 Plataforma web para el control de actividad diaria de trabajadores en campo (instalación y mantenimiento de líneas eléctricas).
 
@@ -110,10 +110,10 @@ La app estará disponible en:
 
 | Email | Contraseña | Rol |
 |-------|-----------|-----|
-| admin@lineas.com | admin123 | Admin |
-| carlos@lineas.com | worker123 | Trabajador |
-| pedro@lineas.com | worker123 | Trabajador |
-| maria@lineas.com | worker123 | Trabajador |
+| admin@tagmap.app | admin123 | Admin |
+| carlos@tagmap.app | worker123 | Trabajador |
+| pedro@tagmap.app | worker123 | Trabajador |
+| maria@tagmap.app | worker123 | Trabajador |
 
 ## API Endpoints
 
@@ -146,7 +146,7 @@ La app estará disponible en:
 
 ### Backend (.env)
 ```
-DATABASE_URL=postgresql://user:pass@localhost:5432/lineas_db
+DATABASE_URL=postgresql://user:pass@localhost:5432/tagmap_db
 JWT_SECRET=minimum_32_character_random_secret
 JWT_EXPIRES_IN=24h
 PORT=4000

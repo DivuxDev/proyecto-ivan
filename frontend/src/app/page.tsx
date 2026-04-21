@@ -34,7 +34,7 @@ export default function RootPage() {
           <div className="w-12 h-12 border-4 border-brand-500/30 rounded-full" />
           <div className="w-12 h-12 border-4 border-brand-500 border-t-transparent rounded-full animate-spin absolute inset-0" />
         </div>
-        <p className="text-navy-200 text-sm font-medium">Cargando LineasCampo...</p>
+        <p className="text-navy-200 text-sm font-medium">Cargando TagMap...</p>
       </div>
     </div>
   );

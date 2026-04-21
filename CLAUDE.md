@@ -1,4 +1,4 @@
-# CLAUDE.md — proyecto ivan (LineasCampo)
+# CLAUDE.md — proyecto ivan (TagMap)
 
 Plataforma de gestión de trabajos de campo para empresa de líneas eléctricas.  
 Monorepo con dos proyectos independientes: `backend/` (API REST) y `frontend/` (Next.js).
@@ -44,8 +44,8 @@ docker compose down
 
 ### Credenciales semilla
 
-- Admin: `admin@lineas.com` / `Admin1234!`
-- Worker demo: `worker@lineas.com` / `Worker1234!`
+- Admin: `admin@tagmap.app` / `Admin1234!`
+- Worker demo: `worker@tagmap.app` / `Worker1234!`
 
 ---
 
