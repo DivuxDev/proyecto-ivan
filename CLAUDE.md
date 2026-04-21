@@ -1,6 +1,7 @@
 # CLAUDE.md — proyecto ivan (TagMap)
 
-Plataforma de gestión de trabajos de campo para empresa de líneas eléctricas.  
+**TagMap** es una plataforma de geotagging visual para trabajos de campo. Permite a equipos subir fotos con GPS automático, visualizarlas en un mapa interactivo, gestionar usuarios y exportar reportes.
+
 Monorepo con dos proyectos independientes: `backend/` (API REST) y `frontend/` (Next.js).
 
 ---
@@ -105,4 +106,77 @@ npm run db:seed       # repoblar DB
 npm run dev           # Next.js en modo desarrollo
 npm run build         # compilar para producción
 npm run lint          # ESLint
+
+# Docker (desde raíz del proyecto)
+docker compose up -d --build              # levantar todo
+docker compose logs -f                    # ver logs
+docker compose down                       # parar servicios
+docker compose down -v                    # parar y borrar volúmenes (¡borra DB!)
+docker compose exec backend npm run db:seed   # seed desde container
 ```
+
+---
+
+## Deployment en producción
+
+### Fresh start (limpiar base de datos y fotos)
+
+Útil cuando cambias el nombre de la app o quieres empezar de cero:
+
+```bash
+# 1. Parar servicios
+docker compose down
+
+# 2. Listar y borrar volúmenes (ajusta prefijo según tu sistema)
+docker volume ls | grep tagmap
+docker volume rm <proyecto>_postgres_data <proyecto>_uploads_data
+
+# 3. Actualizar variables de entorno en Coolify/VPS
+POSTGRES_USER=tagmap_user
+POSTGRES_PASSWORD=<nueva_password>
+POSTGRES_DB=tagmap_db
+DATABASE_URL=postgresql://tagmap_user:<password>@db:5432/tagmap_db
+
+# 4. Redeploy
+docker compose up -d --build
+
+# 5. Inicializar DB
+docker compose exec backend npm run db:migrate
+docker compose exec backend npm run db:seed
+```
+
+### Migrar DB existente (conservar datos)
+
+Si quieres mantener fotos y usuarios tras un cambio de nombre:
+
+```bash
+# 1. Conectar a PostgreSQL
+docker compose exec db psql -U <old_user> -d postgres
+
+# 2. Renombrar DB y usuario
+ALTER DATABASE lineas_db RENAME TO tagmap_db;
+ALTER USER lineas_user RENAME TO tagmap_user;
+ALTER USER tagmap_user WITH PASSWORD '<nueva_password>';
+\q
+
+# 3. Actualizar variables de entorno y redeploy
+```
+
+### Backup automático
+
+```bash
+# Exportar DB
+docker compose exec db pg_dump -U tagmap_user tagmap_db > backup_$(date +%Y%m%d).sql
+
+# Copiar fotos
+docker cp $(docker compose ps -q backend):/app/uploads ./backup_uploads
+
+# Restaurar DB
+docker compose exec -T db psql -U tagmap_user tagmap_db < backup.sql
+```
+
+---
+
+## Integración OneDrive + Power Automate
+
+Ver archivo `DEPLOY-NAS-ONEDRIVE.md` para configurar subida automática desde OneDrive de trabajadores usando Power Automate + API del backend.
