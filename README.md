@@ -2,6 +2,15 @@
 
 Plataforma web de geotagging visual para el control de actividad diaria de trabajadores en campo. Sube fotos con GPS, visualiza ubicaciones en mapa interactivo, exporta reportes y gestiona equipos de trabajo.
 
+<img width="1416" height="904" alt="image" src="https://github.com/user-attachments/assets/5b8b3f52-a724-49aa-b56d-e2366bd954aa" />
+
+<img width="1419" height="907" alt="image" src="https://github.com/user-attachments/assets/dac31b64-f7c8-4e64-8a60-cf77b12a1ec4" />
+
+<img width="1401" height="910" alt="image" src="https://github.com/user-attachments/assets/6159753e-56b3-4d6f-87c0-5ee77b941173" />
+
+
+
+
 ## Stack tecnológico
 
 | Capa | Tecnología |
