@@ -285,6 +285,22 @@ Salida ejemplo:
 
 ---
 
+## Pruebas locales antes de producción
+
+**Guía de pruebas:** [TESTING.md](TESTING.md)
+
+Documentación completa para probar TagMap localmente antes de desplegar en producción, incluyendo:
+- Configuración local con Docker Desktop
+- Prueba de subida manual (modo tradicional)
+- Prueba de Folder Watcher (modo automático)
+- Prueba de detección de duplicados
+- Prueba de fotos sin GPS
+- Prueba de exportación CSV
+- Troubleshooting de entorno local
+- Checklist de validación completo
+
+---
+
 ## Despliegue en QNAP NAS
 
 **Guía completa:** [DEPLOY-QNAP.md](DEPLOY-QNAP.md)
