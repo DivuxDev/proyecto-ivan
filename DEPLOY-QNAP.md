@@ -100,7 +100,17 @@ Entware es un gestor de paquetes para NAS QNAP similar a apt/yum.
 ssh admin@192.168.1.100
 
 # 2. Instalar Entware (si no está instalado)
-wget -O - http://bin.entware.net/x64-k3.2/installer/generic.sh | sh
+# Método 1: Descargar y ejecutar por separado (más confiable)
+wget http://bin.entware.net/x64-k3.2/installer/generic.sh
+sh generic.sh
+
+# Si falla con "Broken pipe", usa Método 2:
+# Método 2: Con curl
+curl -fsSL http://bin.entware.net/x64-k3.2/installer/generic.sh | sh
+
+# Si tu NAS es ARM en vez de x86-64, usa:
+# wget http://bin.entware.net/armv7sf-k3.2/installer/generic.sh
+# sh generic.sh
 
 # 3. Actualizar repositorios de Entware
 opkg update
@@ -131,6 +141,16 @@ docker run --rm -v /share/homes/admin:/workspace alpine/git \
 
 ### Solución de problemas Git
 
+**Error: "Broken pipe" al instalar Entware**
+```bash
+# Descarga el script primero, luego ejecútalo
+wget http://bin.entware.net/x64-k3.2/installer/generic.sh
+sh generic.sh
+
+# O usa curl en vez de wget
+curl -fsSL http://bin.entware.net/x64-k3.2/installer/generic.sh | sh
+```
+
 **Error: "git: command not found"**
 ```bash
 # Verificar PATH
@@ -148,6 +168,16 @@ source ~/.profile
 ```bash
 # Usar HTTPS en vez de SSH
 git clone https://github.com/tu-usuario/tagmap.git
+```
+
+**Verificar arquitectura del NAS**
+```bash
+# Ver arquitectura de tu NAS
+uname -m
+
+# x86_64 → usa x64-k3.2
+# armv7l → usa armv7sf-k3.2
+# aarch64 → usa aarch64-k3.2
 ```
 
 ---
