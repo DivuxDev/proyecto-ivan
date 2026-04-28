@@ -81,6 +81,28 @@ El middleware Next.js (`src/middleware.ts`) redirige `/` al destino correcto seg
 - **Leaflet** requiere importación dinámica con `ssr: false` en cualquier página Next.js.
 - **Soft delete** en usuarios: campo `active: false`, nunca `DELETE` de DB.
 - **Rate limiting**: 20 req/15min en `/auth/login`; 300 req/15min en el resto.
+- **Folder Watcher** (rama `folder-concept`): Importación automática desde carpetas del NAS organizadas por equipo. Ver [FOLDER-WATCHER.md](FOLDER-WATCHER.md).
+
+---
+
+## Modos de operación
+
+TagMap soporta **dos modos** que pueden coexistir:
+
+### Modo 1: Usuario tradicional (por defecto)
+- Workers hacen login en `/worker/upload`
+- Suben fotos desde la interfaz web (cámara o galería)
+- Cada foto se asocia al usuario que la subió
+- Ideal para: equipos pequeños, control individual
+
+### Modo 2: Folder Watcher (rama `folder-concept`)
+- Carpetas en el NAS organizadas por equipo (`/share/TagMapFotos/Equipo-Norte/`)
+- El backend escanea periódicamente y auto-importa fotos nuevas
+- Crea usuarios virtuales por carpeta (`equipo-norte@tagmap.internal`)
+- Las fotos procesadas se mueven a `carpeta/procesadas/`
+- Ideal para: muchos trabajadores, integración con OneDrive/Power Automate, NAS compartido
+
+**Ambos modos pueden usarse simultáneamente** — algunos workers suben desde la web, otros desde carpetas del NAS.
 
 ---
 
@@ -177,6 +199,94 @@ docker compose exec -T db psql -U tagmap_user tagmap_db < backup.sql
 
 ---
 
+## Folder Watcher — Importación automática (rama `folder-concept`)
+
+El Folder Watcher permite importar fotos automáticamente desde carpetas organizadas por equipo en el NAS.
+
+### Variables de entorno necesarias
+
+```env
+# Habilitar el watcher
+ENABLE_FOLDER_WATCHER=true
+
+# Ruta donde están las carpetas de equipos
+WATCH_FOLDERS_DIR=/share/TagMapFotos
+
+# Intervalo de escaneo en segundos (por defecto 60)
+SCAN_INTERVAL_SECONDS=60
+```
+
+### Estructura de carpetas requerida
+
+```
+/share/TagMapFotos/
+  ├── Equipo-Norte/
+  │   ├── foto1.jpg        ← detectada y procesada
+  │   ├── foto2.jpg        ← detectada y procesada
+  │   └── procesadas/      ← creada automáticamente
+  │       ├── foto1.jpg    ← movida tras importar
+  │       └── foto2.jpg    ← movida tras importar
+  ├── Equipo-Sur/
+  │   └── IMG_001.jpg
+  └── Equipo-Centro/
+      └── DCIM_1234.jpg
+```
+
+### Configuración en Docker
+
+Añadir en `docker-compose.yml`:
+
+```yaml
+services:
+  backend:
+    environment:
+      ENABLE_FOLDER_WATCHER: true
+      WATCH_FOLDERS_DIR: /share/TagMapFotos
+      SCAN_INTERVAL_SECONDS: 60
+    volumes:
+      - uploads_data:/app/uploads
+      # Bind mount para carpetas de equipos
+      - /ruta/real/TagMapFotos:/share/TagMapFotos
+```
+
+### Funcionamiento
+
+1. El backend escanea periódicamente `WATCH_FOLDERS_DIR`
+2. Por cada carpeta, crea un usuario virtual: `equipo-norte@tagmap.internal`
+3. Detecta fotos nuevas (`.jpg`, `.jpeg`, `.png`)
+4. Extrae GPS del EXIF, optimiza con Sharp
+5. Guarda en DB asociada al usuario virtual
+6. Mueve el original a `carpeta/procesadas/`
+7. Detecta duplicados por hash MD5
+
+### Monitorización
+
+Ver logs del backend:
+
+```bash
+docker compose logs -f backend
+```
+
+Salida ejemplo:
+
+```
+🔍 Escaneando carpetas en /share/TagMapFotos...
+
+📁 Procesando: Equipo-Norte
+   👤 Usuario virtual creado: Equipo-Norte
+   ✅ foto1.jpg
+   ✅ foto2.jpg
+   Importadas: 2 | Errores: 0
+
+📊 Total: 2 importadas, 0 errores
+```
+
+**Documentación completa:** [FOLDER-WATCHER.md](FOLDER-WATCHER.md)
+
+---
+
 ## Integración OneDrive + Power Automate
 
 Ver archivo `DEPLOY-NAS-ONEDRIVE.md` para configurar subida automática desde OneDrive de trabajadores usando Power Automate + API del backend.
+
+**Nota:** El Folder Watcher es compatible con Power Automate — puedes configurar Power Automate para que copie fotos de OneDrive a las carpetas del NAS, y el Folder Watcher las importará automáticamente.

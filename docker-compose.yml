@@ -30,8 +30,18 @@ services:
       NODE_ENV: production
       UPLOAD_DIR: /app/uploads
       CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:3000}
+      # Folder Watcher (modo NAS)
+      ENABLE_FOLDER_WATCHER: ${ENABLE_FOLDER_WATCHER:-false}
+      WATCH_FOLDERS_DIR: ${WATCH_FOLDERS_DIR:-/share/TagMapFotos}
+      SCAN_INTERVAL_SECONDS: ${SCAN_INTERVAL_SECONDS:-60}
     volumes:
-      - uploads_data:/app/uploads
+      # Carpeta donde el backend guarda fotos optimizadas
+      # En QNAP: cambia por /share/TagMapUploads:/app/uploads
+      - ${UPLOADS_PATH:-uploads_data}:/app/uploads
+      # Carpeta de equipos para auto-importación (solo si ENABLE_FOLDER_WATCHER=true)
+      # En QNAP: cambia por /share/TagMapFotos:/share/TagMapFotos:ro
+      # El :ro es opcional (read-only) para mayor seguridad
+      - ${WATCH_FOLDERS_PATH:-watch_folders_data}:/share/TagMapFotos
 
   frontend:
     build:
@@ -49,4 +59,7 @@ services:
 
 volumes:
   postgres_data:
+  # uploads_data solo se usa si UPLOADS_PATH no está definido
   uploads_data:
+  # watch_folders_data solo se usa si WATCH_FOLDERS_PATH no está definido
+  watch_folders_data:

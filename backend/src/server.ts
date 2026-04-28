@@ -1,6 +1,7 @@
 import 'dotenv/config';
 import app from './app';
 import { connectDatabase, prisma } from './config/database';
+import { startFolderWatcher } from './services/folderWatcher';
 
 const PORT = parseInt(process.env.PORT || '4000', 10);
 
@@ -15,6 +16,9 @@ async function main() {
     console.log(`   📁 Imágenes: http://localhost:${PORT}/uploads`);
     console.log(`   🩺 Health: http://localhost:${PORT}/health`);
     console.log('');
+
+    // Iniciar folder watcher si está habilitado
+    startFolderWatcher();
   });
 
   // Apagado graceful

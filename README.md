@@ -308,6 +308,11 @@ NODE_ENV=development
 UPLOAD_DIR=./uploads
 MAX_FILE_SIZE_MB=10
 CORS_ORIGIN=http://localhost:3000
+
+# Folder Watcher (opcional - rama folder-concept)
+ENABLE_FOLDER_WATCHER=false
+WATCH_FOLDERS_DIR=/share/TagMapFotos
+SCAN_INTERVAL_SECONDS=60
 ```
 
 ### Frontend (.env)
@@ -321,6 +326,7 @@ NEXT_PUBLIC_API_URL=http://localhost:4000
 ✅ **Mapa interactivo** — Visualiza todas las ubicaciones en Leaflet  
 ✅ **Multi-usuario** — Roles ADMIN y WORKER con permisos diferenciados  
 ✅ **Subida masiva** — Selecciona múltiples fotos desde la galería  
+✅ **Folder Watcher** — Importación automática desde carpetas del NAS por equipo (ver [FOLDER-WATCHER.md](FOLDER-WATCHER.md))  
 ✅ **Optimización automática** — Redimensión y compresión con Sharp  
 ✅ **Dashboard analítico** — Gráficas de actividad y estadísticas  
 ✅ **Exportación de datos** — Descarga reportes en Excel  
@@ -332,7 +338,8 @@ NEXT_PUBLIC_API_URL=http://localhost:4000
 - [ ] Almacenamiento en nube (S3 / Cloudflare R2 / Azure Blob)
 - [ ] PWA offline-first con Service Worker + queue de subidas
 - [ ] Notificaciones push (recordatorios, alertas admin)
-- [ ] Integración con OneDrive + Power Automate (auto-upload)
+- [x] **Importación automática desde carpetas del NAS** (rama `folder-concept`)
+- [ ] Integración completa con OneDrive + Power Automate
 - [ ] Firma digital / QR de validación de trabajos
 - [ ] App nativa (React Native o Capacitor)
 - [ ] Multi-tenant (varias empresas en la misma instancia)
