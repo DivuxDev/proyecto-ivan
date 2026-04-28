@@ -318,6 +318,15 @@ Documentación paso a paso para desplegar TagMap en un NAS QNAP con Container St
 
 ## Integración OneDrive + Power Automate
 
-Ver archivo `DEPLOY-NAS-ONEDRIVE.md` para configurar subida automática desde OneDrive de trabajadores usando Power Automate + API del backend.
+**Guía completa:** [ONEDRIVE-POWER-AUTOMATE.md](ONEDRIVE-POWER-AUTOMATE.md)
+
+Documentación paso a paso para configurar subida automática desde OneDrive de trabajadores usando Power Automate + Qsync + Folder Watcher, incluyendo:
+- Configuración de carpetas compartidas en OneDrive
+- Creación de flujos automáticos por trabajador
+- Instalación y configuración de Qsync en el NAS
+- Sincronización automática OneDrive → NAS
+- Flujo completo: Móvil → OneDrive → NAS → TagMap
+- Troubleshooting y mantenimiento
+- Alternativas (FTP, SharePoint, Dropbox)
 
 **Nota:** El Folder Watcher es compatible con Power Automate — puedes configurar Power Automate para que copie fotos de OneDrive a las carpetas del NAS, y el Folder Watcher las importará automáticamente.
