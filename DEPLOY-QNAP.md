@@ -76,25 +76,104 @@ Introduce tu contraseña de admin cuando te la pida.
 
 ---
 
-## Paso 3 — Clonar el repositorio
+## Paso 3 — Instalar Git en el NAS
 
-### Opción A — Desde el propio NAS (si tiene git)
+Git es necesario para clonar el repositorio y usar el script `update.sh`. Hay varias opciones:
+
+### Opción A — Desde App Center (más fácil)
+
+1. Abre **App Center** en tu QNAP
+2. Busca **"Git Server"** o **"Qgit"**
+3. Instalar
+4. Verificar en SSH:
+   ```bash
+   ssh admin@192.168.1.100
+   git --version
+   ```
+
+### Opción B — Via Entware (recomendado, más actualizado)
+
+Entware es un gestor de paquetes para NAS QNAP similar a apt/yum.
 
 ```bash
-# Verificar si git está instalado
+# 1. Conectar via SSH
+ssh admin@192.168.1.100
+
+# 2. Instalar Entware (si no está instalado)
+wget -O - http://bin.entware.net/x64-k3.2/installer/generic.sh | sh
+
+# 3. Actualizar repositorios de Entware
+opkg update
+
+# 4. Instalar git
+opkg install git git-http
+
+# 5. Verificar instalación
 git --version
+# Debería mostrar: git version 2.x.x
+```
 
-# Si no está, instalarlo desde App Center o via entware
+### Opción C — Container con Git (si no quieres instalar en el NAS)
 
+Usa un contenedor temporal de Docker:
+
+```bash
+# 1. Crear carpeta temporal
+mkdir -p /share/homes/admin/tagmap
+
+# 2. Clonar con Docker
+docker run --rm -v /share/homes/admin:/workspace alpine/git \
+  clone -b folder-concept https://github.com/DivuxDev/tagmap.git \
+  /workspace/tagmap
+
+# Nota: No podrás usar update.sh con este método
+```
+
+### Solución de problemas Git
+
+**Error: "git: command not found"**
+```bash
+# Verificar PATH
+echo $PATH
+
+# Añadir Entware al PATH (si instalaste via Entware)
+export PATH=/opt/bin:/opt/sbin:$PATH
+
+# Hacer permanente añadiendo a ~/.profile
+echo 'export PATH=/opt/bin:/opt/sbin:$PATH' >> ~/.profile
+source ~/.profile
+```
+
+**Error: "Permission denied (publickey)"**
+```bash
+# Usar HTTPS en vez de SSH
+git clone https://github.com/tu-usuario/tagmap.git
+```
+
+---
+
+## Paso 4 — Clonar el repositorio
+
+Una vez que Git esté instalado:
+
+```bash
 # Ir a la carpeta de tu usuario
 cd /share/homes/admin
 
-# Clonar el repositorio
+# Clonar el repositorio (rama folder-concept)
 git clone -b folder-concept https://github.com/DivuxDev/tagmap.git
+
+# Entrar al proyecto
 cd tagmap
+
+# Verificar que está la rama correcta
+git branch
+# Debería mostrar: * folder-concept
 ```
 
-### Opción B — Desde tu PC y subir al NAS
+### Alternativa — Subir desde tu PC sin Git
+
+Si no quieres instalar Git en el NAS:
 
 ```bash
 # En tu PC
@@ -110,16 +189,16 @@ tar -czf tagmap.tar.gz .
 
 ---
 
-## Paso 4 — Configurar variables de entorno
+## Paso 5 — Configurar variables de entorno
 
-### 4.1 Crear el archivo .env
+### 5.1 Crear el archivo .env
 
 ```bash
 cd /share/homes/admin/tagmap
 nano .env
 ```
 
-### 4.2 Contenido del .env
+### 5.2 Contenido del .env
 
 ```env
 # Base de datos
@@ -147,7 +226,7 @@ SCAN_INTERVAL_SECONDS=60
 
 **Guardar:** `Ctrl + O` → Enter → `Ctrl + X`
 
-### 4.3 Generar JWT_SECRET
+### 5.3 Generar JWT_SECRET
 
 ```bash
 openssl rand -hex 32
@@ -157,7 +236,7 @@ Copia el resultado y pégalo en `JWT_SECRET` del `.env`.
 
 ---
 
-## Paso 5 — Editar docker-compose.yml (adaptación QNAP)
+## Paso 6 — Editar docker-compose.yml (adaptación QNAP)
 
 El `docker-compose.yml` ya está preparado, solo verifica que las rutas sean correctas:
 
@@ -177,9 +256,9 @@ Si todo está bien, guarda y cierra.
 
 ---
 
-## Paso 6 — Levantar la aplicación
+## Paso 7 — Levantar la aplicación
 
-### 6.1 Build y arranque
+### 7.1 Build y arranque
 
 ```bash
 cd /share/homes/admin/tagmap
@@ -188,7 +267,7 @@ docker compose up -d --build
 
 > La primera vez tardará 5-10 minutos compilando las imágenes.
 
-### 6.2 Verificar que los contenedores están corriendo
+### 7.2 Verificar que los contenedores están corriendo
 
 ```bash
 docker compose ps
@@ -199,7 +278,7 @@ Deberías ver 3 servicios en estado `running`:
 - `tagmap-backend-1`
 - `tagmap-frontend-1`
 
-### 6.3 Ver logs en tiempo real
+### 7.3 Ver logs en tiempo real
 
 ```bash
 docker compose logs -f
@@ -219,9 +298,9 @@ Para salir de los logs: `Ctrl + C`
 
 ---
 
-## Paso 7 — Inicializar la base de datos
+## Paso 8 — Inicializar la base de datos
 
-### 7.1 Ejecutar migraciones
+### 8.1 Ejecutar migraciones
 
 ```bash
 docker compose exec backend npm run db:migrate
@@ -229,7 +308,7 @@ docker compose exec backend npm run db:migrate
 
 > Esto crea las tablas en PostgreSQL.
 
-### 7.2 Crear usuario admin inicial
+### 8.2 Crear usuario admin inicial
 
 ```bash
 docker compose exec backend npm run db:seed
@@ -248,9 +327,9 @@ Verás:
 
 ---
 
-## Paso 8 — Probar la aplicación
+## Paso 9 — Probar la aplicación
 
-### 8.1 Acceder desde el navegador
+### 9.1 Acceder desde el navegador
 
 Abre en tu navegador:
 
@@ -260,14 +339,14 @@ http://192.168.1.100:3000
 
 > Cambia `192.168.1.100` por la IP real de tu NAS.
 
-### 8.2 Hacer login
+### 9.2 Hacer login
 
 - Email: `admin@tagmap.app`
 - Contraseña: `admin123`
 
 Si entras correctamente, verás el dashboard admin vacío (sin fotos todavía).
 
-### 8.3 Cambiar contraseña del admin
+### 9.3 Cambiar contraseña del admin
 
 1. **Dashboard** → **Usuarios**
 2. Busca el admin → botón del candado (cambiar contraseña)
@@ -275,9 +354,9 @@ Si entras correctamente, verás el dashboard admin vacío (sin fotos todavía).
 
 ---
 
-## Paso 9 — Probar el Folder Watcher
+## Paso 10 — Probar el Folder Watcher
 
-### 9.1 Subir una foto de prueba
+### 10.1 Subir una foto de prueba
 
 Desde tu PC, abre el File Station del NAS (web o app):
 
@@ -285,7 +364,7 @@ Desde tu PC, abre el File Station del NAS (web o app):
 2. Arrastra una foto JPG tomada con tu móvil (que tenga GPS en el EXIF)
 3. Espera 60 segundos (el intervalo de escaneo)
 
-### 9.2 Ver los logs del backend
+### 10.2 Ver los logs del backend
 
 ```bash
 docker compose logs -f backend
@@ -304,14 +383,14 @@ Deberías ver algo como:
 📊 Total: 1 importadas, 0 errores
 ```
 
-### 9.3 Verificar en la app
+### 10.3 Verificar en la app
 
 1. Refresca el navegador (`F5`)
 2. **Dashboard** → **Fotos**
 3. Deberías ver tu foto con el usuario "Equipo-Norte"
 4. **Dashboard** → **Mapa** → la foto aparece en el mapa si tenía GPS
 
-### 9.4 Verificar que la foto se movió
+### 10.4 Verificar que la foto se movió
 
 Vuelve al File Station:
 
@@ -323,16 +402,16 @@ TagMapFotos/Equipo-Norte/procesadas/tu-foto.jpg  ← la foto está aquí ahora
 
 ---
 
-## Paso 10 — Acceso externo con Cloudflare Tunnel (recomendado)
+## Paso 11 — Acceso externo con Cloudflare Tunnel (recomendado)
 
 Si quieres acceder desde internet con HTTPS sin abrir puertos en el router:
 
-### 10.1 Requisitos
+### 11.1 Requisitos
 
 - Dominio propio con DNS en Cloudflare (gratis)
 - Cuenta en [dash.cloudflare.com](https://dash.cloudflare.com)
 
-### 10.2 Crear el túnel
+### 11.2 Crear el túnel
 
 1. Ve a **dash.cloudflare.com** → **Zero Trust** → **Networks** → **Tunnels**
 2. **Create a tunnel** → nombre: `tagmap`
@@ -343,7 +422,7 @@ Si quieres acceder desde internet con HTTPS sin abrir puertos en el router:
    - Service: `http://localhost:3000`
 5. Guarda
 
-### 10.3 Ejecutar cloudflared en el NAS
+### 11.3 Ejecutar cloudflared en el NAS
 
 Desde SSH en el NAS:
 
@@ -358,7 +437,7 @@ docker run -d \
 
 > Sustituye `TU_TOKEN_AQUI` por el token que copiaste.
 
-### 10.4 Verificar que conectó
+### 11.4 Verificar que conectó
 
 ```bash
 docker logs cloudflared
@@ -366,7 +445,7 @@ docker logs cloudflared
 
 Busca: `Registered tunnel connection`
 
-### 10.5 Actualizar CORS_ORIGIN
+### 11.5 Actualizar CORS_ORIGIN
 
 Edita el `.env`:
 
@@ -386,7 +465,7 @@ Reinicia el backend:
 docker compose restart backend
 ```
 
-### 10.6 Probar acceso externo
+### 11.6 Probar acceso externo
 
 Desde tu móvil (datos móviles, no WiFi local):
 
@@ -398,7 +477,7 @@ Deberías ver la pantalla de login con HTTPS válido.
 
 ---
 
-## Paso 11 — Integración con OneDrive (opcional)
+## Paso 12 — Integración con OneDrive (opcional)
 
 Si quieres que los trabajadores suban fotos desde el móvil automáticamente:
 
