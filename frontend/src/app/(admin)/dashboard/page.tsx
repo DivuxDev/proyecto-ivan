@@ -14,6 +14,7 @@ import {
 import type { StatsOverview, WorkerStats, DailyActivity } from '@/types';
 import ActivityChart from '@/components/charts/ActivityChart';
 import WorkerChart from '@/components/charts/WorkerChart';
+import SyncStatus from '@/components/admin/SyncStatus';
 import { useState } from 'react';
 
 type Period = 'week' | 'month' | 'year';
@@ -137,6 +138,11 @@ export default function DashboardPage() {
             </div>
           );
         })}
+      </div>
+
+      {/* Folder Watcher Status */}
+      <div className="mb-8">
+        <SyncStatus />
       </div>
 
       {/* Gráficas */}

@@ -139,6 +139,80 @@ docker compose exec backend npm run db:seed   # seed desde container
 
 ---
 
+## Scripts de automatización (para Container Station en QNAP)
+
+TagMap incluye tres scripts bash para gestión completa del deployment:
+
+### install.sh — Primera instalación
+```bash
+# Conectar via SSH al NAS
+ssh admin@192.168.1.100
+
+# Navegar al proyecto
+cd /share/homes/admin/tagmap
+
+# Ejecutar instalación
+bash install.sh
+```
+
+**Acciones que realiza:**
+- ✅ Verifica Docker y Docker Compose
+- ✅ Crea `.env` desde `.env.example` con validación interactiva
+- ✅ Construye las imágenes Docker
+- ✅ Levanta los contenedores
+- ✅ Espera 30s a que PostgreSQL esté listo
+- ✅ Ejecuta migraciones de base de datos
+- ✅ Crea usuario admin inicial (admin@tagmap.app / admin123)
+- ✅ Muestra URLs de acceso y credenciales
+
+### update.sh — Actualización desde Git
+```bash
+# Actualizar a la última versión
+bash update.sh
+```
+
+**Acciones que realiza:**
+- ✅ Detecta rama actual de Git
+- ✅ Muestra cambios locales pendientes (opción de descartarlos)
+- ✅ Hace backup automático de `.env`
+- ✅ Descarga commits nuevos desde GitHub
+- ✅ Muestra lista de commits nuevos
+- ✅ Para contenedores, actualiza código, reconstruye imágenes
+- ✅ Ejecuta migraciones (si hay cambios en BD)
+- ✅ Reinicia servicios con la nueva versión
+
+### sync.sh — Sincronización de emergencia (disaster recovery)
+```bash
+# Reimportar fotos desde el NAS tras pérdida de DB
+bash sync.sh
+```
+
+**Acciones que realiza:**
+- ✅ Escanea todas las carpetas en `/share/TagMapFotos`
+- ✅ Detecta fotos por importar
+- ✅ Muestra resumen (fotos encontradas por equipo)
+- ✅ El Folder Watcher las importará automáticamente
+- ✅ Detección de duplicados por hash MD5 (evita reimportar fotos ya en DB)
+
+**Cuándo usar sync.sh:**
+- Tras reinstalación completa de TagMap
+- Cuando la base de datos se ha borrado/corrompido
+- Para verificar consistencia entre NAS y DB
+
+### Monitorización del Folder Watcher (frontend)
+
+El dashboard admin incluye un panel **Folder Watcher Status** que muestra en tiempo real:
+- ✅ Estado (habilitado/deshabilitado)
+- ✅ Última fecha de sincronización
+- ✅ Resultado del último scan (fotos importadas, errores)
+- ✅ Tiempo hasta el próximo escaneo
+- ✅ Carpeta monitoreada
+- ✅ Botón de actualización manual
+
+**Endpoint API:** `GET /api/folder-watcher/status` (requiere rol ADMIN)
+
+---
+
 ## Deployment en producción
 
 ### Fresh start (limpiar base de datos y fotos)

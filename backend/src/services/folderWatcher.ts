@@ -15,6 +15,28 @@ interface ImportResult {
   errors: number;
 }
 
+// Estado global del folder watcher
+let lastScanDate: Date | null = null;
+let lastScanResult: ImportResult = { success: 0, skipped: 0, errors: 0 };
+let isScanning = false;
+
+/**
+ * Obtiene el estado actual del folder watcher
+ */
+export function getWatcherStatus() {
+  return {
+    enabled: process.env.ENABLE_FOLDER_WATCHER === 'true',
+    watchDir: WATCH_DIR,
+    scanIntervalSeconds: SCAN_INTERVAL / 1000,
+    lastScanDate,
+    lastScanResult,
+    isScanning,
+    nextScanIn: lastScanDate ? 
+      Math.max(0, SCAN_INTERVAL - (Date.now() - lastScanDate.getTime())) / 1000 : 
+      null,
+  };
+}
+
 /**
  * Calcula el hash MD5 de un archivo para detectar duplicados
  */
@@ -176,6 +198,7 @@ async function scanAllFolders(): Promise<void> {
     return;
   }
 
+  isScanning = true;
   console.log(`\n🔍 Escaneando carpetas en ${WATCH_DIR}...`);
 
   const folders = fs.readdirSync(WATCH_DIR);
@@ -218,6 +241,11 @@ async function scanAllFolders(): Promise<void> {
   if (totalSuccess > 0 || totalErrors > 0) {
     console.log(`\n📊 Total: ${totalSuccess} importadas, ${totalErrors} errores\n`);
   }
+
+  // Actualizar estado
+  lastScanDate = new Date();
+  lastScanResult = { success: totalSuccess, skipped: totalSkipped, errors: totalErrors };
+  isScanning = false;
 }
 
 /**

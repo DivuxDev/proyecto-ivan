@@ -94,3 +94,9 @@ export const statsApi = {
       responseType: 'blob',
     }),
 };
+
+// ─── Folder Watcher ──────────────────────────────────────────────────────────
+
+export const folderWatcherApi = {
+  getStatus: () => api.get('/folder-watcher/status'),
+};
