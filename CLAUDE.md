@@ -285,6 +285,21 @@ Salida ejemplo:
 
 ---
 
+## Despliegue en QNAP NAS
+
+**Guía completa:** [DEPLOY-QNAP.md](DEPLOY-QNAP.md)
+
+Documentación paso a paso para desplegar TagMap en un NAS QNAP con Container Station, incluyendo:
+- Configuración de carpetas compartidas
+- Instalación con Docker Compose
+- Activación del Folder Watcher
+- Acceso externo con Cloudflare Tunnel
+- Backup automático
+- Troubleshooting común
+- Checklist de producción
+
+---
+
 ## Integración OneDrive + Power Automate
 
 Ver archivo `DEPLOY-NAS-ONEDRIVE.md` para configurar subida automática desde OneDrive de trabajadores usando Power Automate + API del backend.
