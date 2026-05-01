@@ -1,0 +1,89 @@
+# ===========================================
+# TagMap - Docker Compose para QNAP NAS
+# ===========================================
+# Configuración optimizada para Container Station
+# Proyecto en: /share/homes/DavidPrado/tagmap
+# Imágenes originales: /share/Container/imagenes-tagmap
+# Imágenes optimizadas: /share/Container/imagenes-tagmap-optimized
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: tagmap_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-tagmap_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-tagmap_pass}
+      POSTGRES_DB: ${POSTGRES_DB:-tagmap_db}
+    volumes:
+      # Datos de PostgreSQL se guardan en un volumen nombrado
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-tagmap_user} -d ${POSTGRES_DB:-tagmap_db}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - tagmap_network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: tagmap_backend
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-tagmap_user}:${POSTGRES_PASSWORD:-tagmap_pass}@db:5432/${POSTGRES_DB:-tagmap_db}
+      JWT_SECRET: ${JWT_SECRET:-change_this_secret_in_production_min_32_chars}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-24h}
+      PORT: 4000
+      NODE_ENV: production
+      UPLOAD_DIR: /app/uploads
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:3000}
+      # Folder Watcher - Importación automática
+      ENABLE_FOLDER_WATCHER: ${ENABLE_FOLDER_WATCHER:-false}
+      WATCH_FOLDERS_DIR: ${WATCH_FOLDERS_DIR:-/share/TagMapFotos}
+      SCAN_INTERVAL_SECONDS: ${SCAN_INTERVAL_SECONDS:-60}
+    volumes:
+      # Carpeta de imágenes OPTIMIZADAS (procesadas por el backend)
+      # El backend guarda aquí las fotos después de optimizarlas con Sharp
+      - /share/Container/imagenes-tagmap-optimized:/app/uploads
+      
+      # Carpeta de imágenes ORIGINALES organizadas por equipos
+      # El Folder Watcher lee estas carpetas y auto-importa las fotos
+      # Estructura esperada: /share/Container/imagenes-tagmap/Equipo-Norte/foto.jpg
+      - /share/Container/imagenes-tagmap:/share/TagMapFotos:ro
+    networks:
+      - tagmap_network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        INTERNAL_API_URL: http://backend:4000
+    container_name: tagmap_frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    environment:
+      INTERNAL_API_URL: http://backend:4000
+    ports:
+      # Puerto de acceso al frontend
+      # Acceso: http://<IP-DEL-NAS>:3000
+      - "3000:3000"
+    networks:
+      - tagmap_network
+
+volumes:
+  # Volumen para datos de PostgreSQL
+  postgres_data:
+    driver: local
+
+networks:
+  # Red interna para comunicación entre contenedores
+  tagmap_network:
+    driver: bridge
