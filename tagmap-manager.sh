@@ -361,16 +361,20 @@ reset_database() {
     
     echo ""
     
-    # Levantar contenedores
-    print_info "Levantando contenedores con base de datos limpia..."
-    docker compose -f "$DOCKER_COMPOSE_FILE" up -d
+    # Reconstruir y levantar contenedores con base de datos limpia
+    print_info "Reconstruyendo y levantando contenedores..."
+    docker compose -f "$DOCKER_COMPOSE_FILE" up -d --build
     
     # Esperar PostgreSQL
     wait_for_postgres
     
     # Sincronizar schema (sin necesidad de migraciones)
     print_info "Sincronizando schema de base de datos..."
-    docker compose -f "$DOCKER_COMPOSE_FILE" exec -T backend npm run db:push
+    docker compose -f "$DOCKER_COMPOSE_FILE" exec -T backend npm run db:push || {
+        print_error "Error al sincronizar schema"
+        print_info "Verifica los logs: docker compose -f $DOCKER_COMPOSE_FILE logs backend"
+        exit 1
+    }
     print_success "Schema sincronizado"
     
     echo ""
