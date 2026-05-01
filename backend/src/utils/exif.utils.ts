@@ -30,7 +30,10 @@ export async function extractExifData(filePath: string): Promise<PhotoMetadata> 
       translateKeys: true,
     });
 
-    if (!exif) return {};
+    if (!exif) {
+      console.warn(`[EXIF] No se encontraron metadatos en ${path.basename(filePath)}`);
+      return {};
+    }
 
     const result: PhotoMetadata = {};
 
@@ -66,6 +69,18 @@ export async function extractExifData(filePath: string): Promise<PhotoMetadata> 
     if (exif.FNumber != null) result.exifAperture = exif.FNumber;
     if (exif.ExposureTime != null) result.exifShutter = exif.ExposureTime;
     if (exif.FocalLength != null) result.exifFocalLen = exif.FocalLength;
+
+    // Log de metadatos extraídos
+    console.log(`[EXIF] Metadatos extraídos de ${path.basename(filePath)}:`, {
+      gps: result.latitude && result.longitude ? `${result.latitude}, ${result.longitude}` : 'No',
+      altitude: result.altitude ? `${result.altitude}m` : 'No',
+      camera: result.exifMake || result.exifModel ? `${result.exifMake || ''} ${result.exifModel || ''}`.trim() : 'No',
+      iso: result.exifIso ?? 'No',
+      aperture: result.exifAperture ? `f/${result.exifAperture}` : 'No',
+      shutter: result.exifShutter ? `${result.exifShutter}s` : 'No',
+      focal: result.exifFocalLen ? `${result.exifFocalLen}mm` : 'No',
+      takenAt: result.takenAt?.toISOString() || 'No',
+    });
 
     return result;
   } catch (err) {
