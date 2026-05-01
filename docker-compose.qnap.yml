@@ -53,9 +53,11 @@ services:
       - /share/Container/imagenes-tagmap-optimized:/app/uploads
       
       # Carpeta de imágenes ORIGINALES organizadas por equipos
-      # El Folder Watcher lee estas carpetas y auto-importa las fotos
-      # Estructura esperada: /share/Container/imagenes-tagmap/Equipo-Norte/foto.jpg
-      - /share/Container/imagenes-tagmap:/share/TagMapFotos:ro
+      # El Folder Watcher lee estas carpetas, auto-importa las fotos
+      # y las mueve a subcarpeta 'procesadas/' tras importarlas
+      # IMPORTANTE: Necesita permisos de escritura para crear 'procesadas/' y mover archivos
+      # Estructura: /share/Container/imagenes-tagmap/Equipo-Norte/foto.jpg
+      - /share/Container/imagenes-tagmap:/share/TagMapFotos
     networks:
       - tagmap_network
 
