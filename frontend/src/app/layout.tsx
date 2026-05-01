@@ -6,13 +6,17 @@ export const metadata: Metadata = {
   title: 'TagMap',
   description: 'Gestión de trabajos de campo geolocalizados',
   applicationName: 'TagMap',
+  icons: {
+    icon: '/logo.jpg',
+    apple: '/logo.jpg',
+  },
 };
 
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   maximumScale: 1,
-  themeColor: '#F59E0B',
+  themeColor: '#585f35',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

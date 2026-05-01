@@ -2,6 +2,7 @@
 
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useAuth } from '@/hooks/useAuth';
 import {
   LayoutDashboard,
@@ -9,7 +10,6 @@ import {
   Images,
   Map,
   LogOut,
-  Zap,
   Menu,
   X,
 } from 'lucide-react';
@@ -36,8 +36,8 @@ export default function AdminSidebar() {
       {/* Logo */}
       <div className="px-6 py-5 border-b border-navy-600">
         <div className="flex items-center gap-2.5">
-          <div className="w-9 h-9 bg-brand-500 rounded-xl flex items-center justify-center shadow-amber-glow">
-            <Zap className="w-5 h-5 text-white fill-white" />
+          <div className="w-9 h-9 bg-brand-500 rounded-xl flex items-center justify-center shadow-brand-glow overflow-hidden">
+            <Image src="/logo.jpg" alt="TagMap" width={36} height={36} className="object-cover" />
           </div>
           <div>
             <p className="font-display text-base font-bold text-white tracking-wide">
@@ -118,11 +118,11 @@ export default function AdminSidebar() {
           <Menu className="w-5 h-5" />
         </button>
         <div className="flex items-center gap-2">
-          <div className="w-7 h-7 bg-brand-500 rounded-lg flex items-center justify-center">
-            <Zap className="w-4 h-4 text-white fill-white" />
+          <div className="w-7 h-7 bg-brand-500 rounded-lg flex items-center justify-center overflow-hidden">
+            <Image src="/logo.jpg" alt="TagMap" width={28} height={28} className="object-cover" />
           </div>
           <span className="font-display text-sm font-bold text-white tracking-wide">
-            LINEAS<span className="text-brand-500">CAMPO</span>
+            TAG<span className="text-brand-500">MAP</span>
           </span>
         </div>
       </header>

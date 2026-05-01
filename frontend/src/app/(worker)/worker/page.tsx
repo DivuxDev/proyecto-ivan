@@ -5,7 +5,7 @@ import { photosApi } from '@/lib/api';
 import { useAuthStore } from '@/store/authStore';
 import { useAuth } from '@/hooks/useAuth';
 import { formatDate, timeAgo, getPhotoSrc } from '@/lib/utils';
-import { Camera, Images, Clock, MapPin, LogOut, Zap, ChevronRight } from 'lucide-react';
+import { Camera, Images, Clock, MapPin, LogOut, ChevronRight } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import type { Photo, PaginatedPhotos } from '@/types';
@@ -42,8 +42,8 @@ export default function WorkerHomePage() {
       <header className="bg-navy-800 pt-safe px-5 pb-5">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-brand-500 rounded-lg flex items-center justify-center">
-              <Zap className="w-5 h-5 text-white fill-white" />
+            <div className="w-8 h-8 bg-brand-500 rounded-lg flex items-center justify-center overflow-hidden">
+              <Image src="/logo.jpg" alt="TagMap" width={32} height={32} className="object-cover" />
             </div>
             <span className="font-display text-base font-bold text-white tracking-wide">
               TAG<span className="text-brand-500">MAP</span>
@@ -92,7 +92,7 @@ export default function WorkerHomePage() {
 
         {/* Botón de captura rápida */}
         <Link href="/worker/upload">
-          <div className="bg-brand-500 rounded-2xl p-5 shadow-amber-glow flex items-center gap-4 active:scale-[0.98] transition-transform">
+          <div className="bg-brand-500 rounded-2xl p-5 shadow-brand-glow flex items-center gap-4 active:scale-[0.98] transition-transform">
             <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
               <Camera className="w-7 h-7 text-white" />
             </div>

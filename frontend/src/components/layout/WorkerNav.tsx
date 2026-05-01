@@ -40,7 +40,7 @@ export default function WorkerNav() {
               {isUpload ? (
                 <div
                   className={cn(
-                    '-mt-5 w-14 h-14 rounded-full flex items-center justify-center shadow-amber-glow transition-all',
+                    '-mt-5 w-14 h-14 rounded-full flex items-center justify-center shadow-brand-glow transition-all',
                     active
                       ? 'bg-brand-600 scale-105'
                       : 'bg-brand-500 hover:bg-brand-600'

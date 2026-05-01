@@ -155,7 +155,7 @@ export default function UploadPage() {
             {/* Botón cámara */}
             <button
               onClick={() => cameraInputRef.current?.click()}
-              className="w-full bg-brand-500 text-white rounded-2xl py-5 flex flex-col items-center gap-2 active:scale-[0.98] transition-transform shadow-amber-glow"
+              className="w-full bg-brand-500 text-white rounded-2xl py-5 flex flex-col items-center gap-2 active:scale-[0.98] transition-transform shadow-brand-glow"
             >
               <Camera className="w-8 h-8" />
               <span className="font-semibold text-base">Usar cámara</span>
