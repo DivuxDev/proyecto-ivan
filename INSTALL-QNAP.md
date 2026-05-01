@@ -8,7 +8,40 @@
 
 ---
 
-## Pasos de instalación
+## 🚀 Inicio Rápido (Recomendado)
+
+### Script de gestión automática
+
+TagMap incluye un script interactivo que gestiona todo: instalación, actualización y mantenimiento.
+
+```bash
+# Conectar al NAS
+ssh DavidPrado@192.168.1.201
+
+# Navegar al proyecto
+cd /share/homes/DavidPrado/tagmap
+
+# Dar permisos de ejecución
+chmod +x tagmap-manager.sh
+
+# Ejecutar el gestor
+sudo ./tagmap-manager.sh
+```
+
+El script muestra un menú con opciones:
+1. **🚀 Instalación inicial completa** - Primera vez
+2. **🔄 Actualizar desde GitHub** - Actualizar código
+3. **🗄️ Resetear y remigrar base de datos** - Reconstruir BD y sincronizar fotos
+4. **📊 Ver estado y logs** - Monitorizar el sistema
+5. **🚪 Salir**
+
+**Todo está automatizado**: backup, migraciones, sincronización de fotos, verificación de estado.
+
+---
+
+## Instalación Manual (Paso a Paso)
+
+Si prefieres hacerlo manualmente o entender cada paso:
 
 ### 1. Preparar las carpetas en el NAS
 

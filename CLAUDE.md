@@ -141,17 +141,72 @@ docker compose exec backend npm run db:seed   # seed desde container
 
 ## Scripts de automatización (para Container Station en QNAP)
 
-TagMap incluye tres scripts bash para gestión completa del deployment:
+TagMap incluye scripts bash para gestión completa del deployment en QNAP NAS.
 
-### install.sh — Primera instalación
+### tagmap-manager.sh — Script de gestión todo-en-uno (RECOMENDADO) 🌟
+
+Script interactivo con menú que gestiona todo el ciclo de vida de TagMap en QNAP.
+
 ```bash
 # Conectar via SSH al NAS
-ssh admin@192.168.1.100
+ssh DavidPrado@192.168.1.201
 
 # Navegar al proyecto
-cd /share/homes/admin/tagmap
+cd /share/homes/DavidPrado/tagmap
 
-# Ejecutar instalación
+# Ejecutar gestor
+sudo ./tagmap-manager.sh
+```
+
+**Menú de opciones:**
+
+1. **🚀 Instalación inicial completa**
+   - Verifica Docker y requisitos
+   - Crea carpetas con permisos correctos
+   - Valida configuración `.env`
+   - Construye imágenes, levanta contenedores
+   - Ejecuta migraciones y seed
+   - Muestra credenciales de acceso
+
+2. **🔄 Actualizar desde GitHub**
+   - Usa contenedor Docker (sin necesidad de Git instalado)
+   - Backup automático del `.env`
+   - Muestra commits nuevos antes de actualizar
+   - Reconstruye contenedores
+   - Ejecuta migraciones automáticamente
+
+3. **🗄️ Resetear y remigrar base de datos**
+   - Backup automático de BD actual
+   - Elimina volumen PostgreSQL
+   - Recrea BD limpia desde cero
+   - Ejecuta migraciones y seed
+   - **Sincroniza todas las fotos desde el NAS automáticamente**
+   - Activa Folder Watcher si estaba deshabilitado
+
+4. **📊 Ver estado y logs**
+   - Estado de contenedores
+   - Fotos por equipo (pendientes/procesadas)
+   - Configuración actual
+   - Logs en tiempo real
+
+**Ventajas:**
+- Todo automatizado en un solo script
+- Backups automáticos antes de cambios
+- Confirmación antes de acciones destructivas
+- Sincronización completa de fotos del NAS
+- No requiere Git instalado en el NAS
+- Interface colorida y clara
+
+**Documentación completa:** [TAGMAP-MANAGER.md](TAGMAP-MANAGER.md)
+
+---
+
+### Scripts individuales (alternativos)
+
+Si prefieres ejecutar operaciones específicas:
+
+#### install.sh — Primera instalación
+```bash
 bash install.sh
 ```
 
@@ -162,33 +217,30 @@ bash install.sh
 - ✅ Levanta los contenedores
 - ✅ Espera 30s a que PostgreSQL esté listo
 - ✅ Ejecuta migraciones de base de datos
-- ✅ Crea usuario admin inicial (admin@tagmap.app / admin123)
+- ✅ Crea usuario admin inicial (admin@tagmap.app / Admin1234!)
 - ✅ Muestra URLs de acceso y credenciales
 
-### update.sh — Actualización desde Git
+#### update-qnap.sh — Actualización desde GitHub (sin Git)
 ```bash
-# Actualizar a la última versión
-bash update.sh
+bash update-qnap.sh
 ```
 
 **Acciones que realiza:**
-- ✅ Detecta rama actual de Git
-- ✅ Muestra cambios locales pendientes (opción de descartarlos)
+- ✅ Detecta rama actual usando contenedor Git
+- ✅ Muestra commits nuevos disponibles
 - ✅ Hace backup automático de `.env`
-- ✅ Descarga commits nuevos desde GitHub
-- ✅ Muestra lista de commits nuevos
-- ✅ Para contenedores, actualiza código, reconstruye imágenes
+- ✅ Descarga actualizaciones desde GitHub
+- ✅ Reconstruye contenedores
 - ✅ Ejecuta migraciones (si hay cambios en BD)
-- ✅ Reinicia servicios con la nueva versión
+- ✅ Restaura el `.env` tras actualizar
 
-### sync.sh — Sincronización de emergencia (disaster recovery)
+#### sync.sh — Sincronización de emergencia (disaster recovery)
 ```bash
-# Reimportar fotos desde el NAS tras pérdida de DB
 bash sync.sh
 ```
 
 **Acciones que realiza:**
-- ✅ Escanea todas las carpetas en `/share/TagMapFotos`
+- ✅ Escanea todas las carpetas en `/share/Container/imagenes-tagmap`
 - ✅ Detecta fotos por importar
 - ✅ Muestra resumen (fotos encontradas por equipo)
 - ✅ El Folder Watcher las importará automáticamente
