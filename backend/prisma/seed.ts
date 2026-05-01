@@ -26,7 +26,7 @@ async function main() {
   console.log(`   Total usuarios creados: 1`);
   console.log('');
   console.log('📁 Los usuarios trabajadores se crearán automáticamente');
-  console.log('   al detectar carpetas en storage/equipos/');
+  console.log('   al detectar carpetas en /storage');
 
   return { admin };
 }
