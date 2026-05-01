@@ -43,3 +43,4 @@ backend/prisma/migrations/
 
 # Docker volumes / generated
 uploads/
+storage/

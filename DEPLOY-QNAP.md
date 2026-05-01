@@ -96,29 +96,37 @@ Git es necesario para clonar el repositorio y usar el script `update.sh`. Hay va
 Entware es un gestor de paquetes para NAS QNAP similar a apt/yum.
 
 ```bash
-# 1. Conectar via SSH
+# 1. Conectar via SSH como admin
 ssh admin@192.168.1.100
 
 # 2. Instalar Entware (si no está instalado)
 # Método 1: Descargar y ejecutar por separado (más confiable)
 wget http://bin.entware.net/x64-k3.2/installer/generic.sh
-sh generic.sh
+
+# IMPORTANTE: Ejecutar con sudo o como root
+sudo sh generic.sh
+# O si no funciona sudo:
+su -c "sh generic.sh"
 
 # Si falla con "Broken pipe", usa Método 2:
 # Método 2: Con curl
-curl -fsSL http://bin.entware.net/x64-k3.2/installer/generic.sh | sh
+curl -fsSL http://bin.entware.net/x64-k3.2/installer/generic.sh | sudo sh
 
 # Si tu NAS es ARM en vez de x86-64, usa:
 # wget http://bin.entware.net/armv7sf-k3.2/installer/generic.sh
-# sh generic.sh
+# sudo sh generic.sh
 
-# 3. Actualizar repositorios de Entware
+# 3. Añadir Entware al PATH
+export PATH=/opt/bin:/opt/sbin:$PATH
+echo 'export PATH=/opt/bin:/opt/sbin:$PATH' >> ~/.profile
+
+# 4. Actualizar repositorios de Entware
 opkg update
 
-# 4. Instalar git
+# 5. Instalar git
 opkg install git git-http
 
-# 5. Verificar instalación
+# 6. Verificar instalación
 git --version
 # Debería mostrar: git version 2.x.x
 ```
@@ -132,7 +140,7 @@ Usa un contenedor temporal de Docker:
 mkdir -p /share/homes/admin/tagmap
 
 # 2. Clonar con Docker
-docker run --rm -v /share/homes/admin:/workspace alpine/git \
+docker run --rm -v $HOME:/workspace alpine/git \
   clone -b folder-concept https://github.com/DivuxDev/tagmap.git \
   /workspace/tagmap
 
@@ -141,17 +149,31 @@ docker run --rm -v /share/homes/admin:/workspace alpine/git \
 
 ### Solución de problemas Git
 
+**Error: "Permission denied" al instalar Entware**
+```bash
+# Ejecutar con sudo (permisos de administrador)
+sudo sh generic.sh
+
+# Si sudo no funciona, cambiar a root:
+su -
+sh generic.sh
+exit
+
+# En algunos QNAP, necesitas habilitar sudo primero:
+# Panel de Control → Usuarios → Permitir sudo para admin
+```
+
 **Error: "Broken pipe" al instalar Entware**
 ```bash
 # Descarga el script primero, luego ejecútalo
 wget http://bin.entware.net/x64-k3.2/installer/generic.sh
-sh generic.sh
+sudo sh generic.sh
 
 # O usa curl en vez de wget
-curl -fsSL http://bin.entware.net/x64-k3.2/installer/generic.sh | sh
+curl -fsSL http://bin.entware.net/x64-k3.2/installer/generic.sh | sudo sh
 ```
 
-**Error: "git: command not found"**
+**Error: "git: command not found" tras instalar Entware**
 ```bash
 # Verificar PATH
 echo $PATH
@@ -162,6 +184,9 @@ export PATH=/opt/bin:/opt/sbin:$PATH
 # Hacer permanente añadiendo a ~/.profile
 echo 'export PATH=/opt/bin:/opt/sbin:$PATH' >> ~/.profile
 source ~/.profile
+
+# Verificar que opkg funciona
+opkg --version
 ```
 
 **Error: "Permission denied (publickey)"**

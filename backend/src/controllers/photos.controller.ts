@@ -168,6 +168,8 @@ export async function deletePhoto(req: AuthRequest, res: Response): Promise<void
 }
 
 export async function getPhotosForMap(req: AuthRequest, res: Response): Promise<void> {
+  const { userId, startDate, endDate } = req.query as PhotoQueryParams;
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const where: Record<string, any> = {
     latitude: { not: null },
@@ -176,8 +178,15 @@ export async function getPhotosForMap(req: AuthRequest, res: Response): Promise<
 
   if (req.user?.role === 'WORKER') {
     where.userId = req.user.userId;
-  } else if (req.query.userId) {
-    where.userId = req.query.userId;
+  } else if (userId) {
+    where.userId = userId;
+  }
+
+  if (startDate || endDate) {
+    where.createdAt = {
+      ...(startDate ? { gte: new Date(startDate) } : {}),
+      ...(endDate ? { lte: new Date(`${endDate}T23:59:59.999Z`) } : {}),
+    };
   }
 
   const photos = await prisma.photo.findMany({

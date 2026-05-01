@@ -50,7 +50,7 @@ function getFileHash(filePath: string): string {
  */
 async function importPhoto(
   filePath: string,
-  userId: number,
+  userId: string,
   teamName: string
 ): Promise<void> {
   const originalFilename = path.basename(filePath);
@@ -192,7 +192,7 @@ async function scanTeamFolder(teamFolderPath: string, teamName: string): Promise
 /**
  * Escanea todas las carpetas de equipos
  */
-async function scanAllFolders(): Promise<void> {
+export async function scanAllFolders(): Promise<void> {
   if (!fs.existsSync(WATCH_DIR)) {
     console.log(`⚠️  Directorio de observación no existe: ${WATCH_DIR}`);
     return;

@@ -1,9 +1,10 @@
 'use client';
 
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation } from '@tanstack/react-query';
 import { folderWatcherApi } from '@/lib/api';
-import { RefreshCw, FolderSync, Clock, CheckCircle, AlertCircle, XCircle } from 'lucide-react';
+import { RefreshCw, FolderSync, Clock, CheckCircle, AlertCircle, XCircle, Play } from 'lucide-react';
 import { timeAgo } from '@/lib/utils';
+import { useState } from 'react';
 
 interface WatcherStatus {
   enabled: boolean;
@@ -20,6 +21,8 @@ interface WatcherStatus {
 }
 
 export default function SyncStatus() {
+  const [syncMessage, setSyncMessage] = useState<string | null>(null);
+  
   const { data, isLoading, refetch } = useQuery({
     queryKey: ['folder-watcher-status'],
     queryFn: async () => {
@@ -28,6 +31,24 @@ export default function SyncStatus() {
     },
     refetchInterval: 10 * 1000, // Refrescar cada 10 segundos
   });
+
+  const triggerSyncMutation = useMutation({
+    mutationFn: () => folderWatcherApi.triggerSync(),
+    onSuccess: () => {
+      setSyncMessage('✅ Sincronización iniciada');
+      setTimeout(() => setSyncMessage(null), 3000);
+      refetch();
+    },
+    onError: (error: any) => {
+      setSyncMessage(`❌ ${error.response?.data?.message || 'Error al iniciar sincronización'}`);
+      setTimeout(() => setSyncMessage(null), 5000);
+    },
+  });
+
+  const handleTriggerSync = () => {
+    if (data?.isScanning) return;
+    triggerSyncMutation.mutate();
+  };
 
   if (isLoading) {
     return (
@@ -82,14 +103,34 @@ export default function SyncStatus() {
             </p>
           </div>
         </div>
-        <button
-          onClick={() => refetch()}
-          className="p-2 hover:bg-navy-700/50 rounded-lg transition-colors group"
-          title="Actualizar estado"
-        >
-          <RefreshCw className="w-4 h-4 text-navy-400 group-hover:text-brand-400 transition-colors" />
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={handleTriggerSync}
+            disabled={data.isScanning || triggerSyncMutation.isPending}
+            className="px-3 py-2 bg-brand-500/20 hover:bg-brand-500/30 disabled:bg-navy-700/50 disabled:cursor-not-allowed rounded-lg transition-colors group flex items-center gap-2"
+            title="Sincronizar ahora"
+          >
+            <Play className={`w-4 h-4 ${data.isScanning || triggerSyncMutation.isPending ? 'text-navy-500' : 'text-brand-400 group-hover:text-brand-300'} transition-colors`} />
+            <span className={`text-xs font-medium ${data.isScanning || triggerSyncMutation.isPending ? 'text-navy-500' : 'text-brand-400 group-hover:text-brand-300'}`}>
+              Sincronizar
+            </span>
+          </button>
+          <button
+            onClick={() => refetch()}
+            className="p-2 hover:bg-navy-700/50 rounded-lg transition-colors group"
+            title="Actualizar estado"
+          >
+            <RefreshCw className="w-4 h-4 text-navy-400 group-hover:text-brand-400 transition-colors" />
+          </button>
+        </div>
       </div>
+
+      {/* Mensaje de estado */}
+      {syncMessage && (
+        <div className="mb-3 p-2 bg-navy-700/50 rounded-lg text-xs text-center text-navy-200">
+          {syncMessage}
+        </div>
+      )}
 
       {/* Última sincronización */}
       <div className="space-y-3">
@@ -97,7 +138,7 @@ export default function SyncStatus() {
           <Clock className="w-4 h-4 text-navy-400" />
           <span className="text-navy-300">Última sincronización:</span>
           <span className="text-white font-medium">
-            {lastScan ? timeAgo(lastScan) : 'Nunca'}
+            {data.lastScanDate ? timeAgo(data.lastScanDate) : 'Nunca'}
           </span>
         </div>
 

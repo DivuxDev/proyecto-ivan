@@ -35,9 +35,13 @@ export default function MapPage() {
   });
 
   const { data: photosData, isLoading } = useQuery({
-    queryKey: ['map-photos', userId],
+    queryKey: ['map-photos', userId, startDate, endDate],
     queryFn: async () => {
-      const res = await photosApi.getMapPhotos(userId || undefined);
+      const res = await photosApi.getMapPhotos({
+        userId: userId || undefined,
+        startDate: startDate || undefined,
+        endDate: endDate || undefined,
+      });
       return res.data.data as MapPhoto[];
     },
   });
@@ -74,13 +78,13 @@ export default function MapPage() {
       {/* Panel de filtros */}
       {showFilters && (
         <div className="bg-navy-700 border-b border-navy-600 px-6 py-4 shrink-0 animate-slide-up">
-          <div className="flex flex-wrap gap-3 items-end">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             <div>
               <label className="block text-xs text-navy-300 mb-1">Trabajador</label>
               <select
                 value={userId}
                 onChange={e => setUserId(e.target.value)}
-                className="input-dark min-w-[200px]"
+                className="input-dark w-full"
               >
                 <option value="">Todos</option>
                 {(users ?? []).map(u => (
@@ -88,14 +92,34 @@ export default function MapPage() {
                 ))}
               </select>
             </div>
+            <div>
+              <label className="block text-xs text-navy-300 mb-1">Fecha desde</label>
+              <input
+                type="date"
+                value={startDate}
+                onChange={e => setStartDate(e.target.value)}
+                className="input-dark w-full"
+              />
+            </div>
+            <div>
+              <label className="block text-xs text-navy-300 mb-1">Fecha hasta</label>
+              <input
+                type="date"
+                value={endDate}
+                onChange={e => setEndDate(e.target.value)}
+                className="input-dark w-full"
+              />
+            </div>
             {hasFilters && (
-              <button
-                onClick={() => { setUserId(''); setStartDate(''); setEndDate(''); }}
-                className="flex items-center gap-1.5 text-xs text-navy-300 hover:text-red-400 transition-colors py-2.5"
-              >
-                <X className="w-3.5 h-3.5" />
-                Limpiar filtros
-              </button>
+              <div className="flex items-end">
+                <button
+                  onClick={() => { setUserId(''); setStartDate(''); setEndDate(''); }}
+                  className="flex items-center gap-1.5 text-xs text-red-400 border border-red-500/30 hover:bg-red-500/10 px-3 py-2.5 rounded-xl transition-colors w-full justify-center"
+                >
+                  <X className="w-3.5 h-3.5" />
+                  Limpiar filtros
+                </button>
+              </div>
             )}
           </div>
         </div>

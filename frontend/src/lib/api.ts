@@ -54,8 +54,8 @@ export const photosApi = {
     api.get('/photos', { params: filters }),
   getById: (id: string) => api.get(`/photos/${id}`),
   delete: (id: string) => api.delete(`/photos/${id}`),
-  getMapPhotos: (userId?: string) =>
-    api.get('/photos/map', { params: userId ? { userId } : {} }),
+  getMapPhotos: (filters?: { userId?: string; startDate?: string; endDate?: string }) =>
+    api.get('/photos/map', { params: filters }),
 };
 
 // ─── Usuarios ────────────────────────────────────────────────────────────────
@@ -99,4 +99,5 @@ export const statsApi = {
 
 export const folderWatcherApi = {
   getStatus: () => api.get('/folder-watcher/status'),
+  triggerSync: () => api.post('/folder-watcher/trigger'),
 };
