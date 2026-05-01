@@ -180,8 +180,8 @@ install_fresh() {
     wait_for_postgres
     
     echo ""
-    print_info "Ejecutando migraciones de base de datos..."
-    docker compose -f "$DOCKER_COMPOSE_FILE" exec -T backend npm run db:migrate
+    print_info "Sincronizando schema de base de datos..."
+    docker compose -f "$DOCKER_COMPOSE_FILE" exec -T backend npm run db:push
     
     echo ""
     print_info "Creando datos iniciales (seed)..."
@@ -291,9 +291,9 @@ update_from_github() {
     
     # Ejecutar migraciones
     print_info "Ejecutando migraciones de base de datos..."
-    docker compose -f "$DOCKER_COMPOSE_FILE" exec -T backend npm run db:migrate || {
-        print_warning "No se pudieron ejecutar migraciones automáticamente"
-        print_info "Ejecuta manualmente: docker compose -f $DOCKER_COMPOSE_FILE exec backend npm run db:migrate"
+    docker compose -f "$DOCKER_COMPOSE_FILE" exec -T backend npm run db:migrate 2>/dev/null || {
+        print_warning "No hay migraciones disponibles, usando db:push..."
+        docker compose -f "$DOCKER_COMPOSE_FILE" exec -T backend npm run db:push
     }
     
     echo ""
@@ -368,10 +368,10 @@ reset_database() {
     # Esperar PostgreSQL
     wait_for_postgres
     
-    # Ejecutar migraciones
-    print_info "Ejecutando migraciones..."
-    docker compose -f "$DOCKER_COMPOSE_FILE" exec -T backend npm run db:migrate
-    print_success "Migraciones ejecutadas"
+    # Sincronizar schema (sin necesidad de migraciones)
+    print_info "Sincronizando schema de base de datos..."
+    docker compose -f "$DOCKER_COMPOSE_FILE" exec -T backend npm run db:push
+    print_success "Schema sincronizado"
     
     echo ""
     
