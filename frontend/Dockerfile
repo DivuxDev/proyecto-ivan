@@ -15,7 +15,6 @@ ENV NEXT_PUBLIC_API_URL=http://localhost:4000
 ARG INTERNAL_API_URL=http://backend:4000
 ENV INTERNAL_API_URL=$INTERNAL_API_URL
 
-RUN mkdir -p public
 RUN npm run build
 
 # Etapa 3: Producción
