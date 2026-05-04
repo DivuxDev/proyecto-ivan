@@ -7,6 +7,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { formatDate, timeAgo, getPhotoSrc } from '@/lib/utils';
 import { Camera, Images, Clock, MapPin, LogOut, ChevronRight } from 'lucide-react';
 import Image from 'next/image';
+import Logo from '@/components/Logo';
 import Link from 'next/link';
 import type { Photo, PaginatedPhotos } from '@/types';
 
