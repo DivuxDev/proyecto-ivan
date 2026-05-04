@@ -62,7 +62,7 @@ export default function LoginPage() {
           {/* Logo */}
           <div className="flex items-center gap-3 mb-12">
             <div className="w-12 h-12 bg-brand-500 rounded-xl flex items-center justify-center shadow-brand-glow overflow-hidden">
-              <Image src="/logo.jpg" alt="TagMap" width={48} height={48} className="object-cover" />
+              <Logo width={48} height={48} className="object-cover" />
             </div>
             <div>
               <h1 className="font-display text-2xl font-bold text-white tracking-wide">
@@ -107,7 +107,7 @@ export default function LoginPage() {
           {/* Logo móvil */}
           <div className="flex items-center gap-2 mb-8 md:hidden">
             <div className="w-9 h-9 bg-brand-500 rounded-lg flex items-center justify-center overflow-hidden">
-              <Image src="/logo.jpg" alt="TagMap" width={36} height={36} className="object-cover" />
+              <Logo width={36} height={36} className="object-cover" />
             </div>
             <span className="font-display text-xl font-bold text-white tracking-wide">
               TAG<span className="text-brand-500">MAP</span>

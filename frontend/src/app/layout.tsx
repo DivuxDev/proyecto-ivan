@@ -7,8 +7,8 @@ export const metadata: Metadata = {
   description: 'Gestión de trabajos de campo geolocalizados',
   applicationName: 'TagMap',
   icons: {
-    icon: '/logo.jpg',
-    apple: '/logo.jpg',
+    icon: '/favicon.ico',
+    apple: '/favicon.ico',
   },
 };
 

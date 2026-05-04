@@ -37,7 +37,7 @@ export default function AdminSidebar() {
       <div className="px-6 py-5 border-b border-navy-600">
         <div className="flex items-center gap-2.5">
           <div className="w-9 h-9 bg-brand-500 rounded-xl flex items-center justify-center shadow-brand-glow overflow-hidden">
-            <Image src="/logo.jpg" alt="TagMap" width={36} height={36} className="object-cover" />
+            <Logo width={36} height={36} className="object-cover" />
           </div>
           <div>
             <p className="font-display text-base font-bold text-white tracking-wide">
@@ -119,7 +119,7 @@ export default function AdminSidebar() {
         </button>
         <div className="flex items-center gap-2">
           <div className="w-7 h-7 bg-brand-500 rounded-lg flex items-center justify-center overflow-hidden">
-            <Image src="/logo.jpg" alt="TagMap" width={28} height={28} className="object-cover" />
+            <Logo width={28} height={28} className="object-cover" />
           </div>
           <span className="font-display text-sm font-bold text-white tracking-wide">
             TAG<span className="text-brand-500">MAP</span>
