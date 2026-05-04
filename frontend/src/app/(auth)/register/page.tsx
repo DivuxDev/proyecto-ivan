@@ -6,7 +6,6 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import Image from 'next/image';
-import Logo from '@/components/Logo';
 import { Mail, Lock, User, AlertCircle, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { getErrorMessage } from '@/lib/utils';
@@ -56,7 +55,7 @@ export default function RegisterPage() {
         {/* Logo */}
         <div className="flex items-center gap-2 mb-8 justify-center">
           <div className="w-10 h-10 bg-brand-500 rounded-xl flex items-center justify-center shadow-brand-glow overflow-hidden">
-            <Logo width={40} height={40} className="object-cover" />
+            <Image src="/logo.jpg" alt="TagMap" width={40} height={40} className="object-cover" />
           </div>
           <span className="font-display text-2xl font-bold text-white tracking-wide">
             TAG<span className="text-brand-500">MAP</span>

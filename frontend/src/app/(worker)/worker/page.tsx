@@ -7,7 +7,6 @@ import { useAuth } from '@/hooks/useAuth';
 import { formatDate, timeAgo, getPhotoSrc } from '@/lib/utils';
 import { Camera, Images, Clock, MapPin, LogOut, ChevronRight } from 'lucide-react';
 import Image from 'next/image';
-import Logo from '@/components/Logo';
 import Link from 'next/link';
 import type { Photo, PaginatedPhotos } from '@/types';
 
@@ -44,7 +43,7 @@ export default function WorkerHomePage() {
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 bg-brand-500 rounded-lg flex items-center justify-center overflow-hidden">
-              <Logo width={32} height={32} className="object-cover" />
+              <Image src="/logo.jpg" alt="TagMap" width={32} height={32} className="object-cover" />
             </div>
             <span className="font-display text-base font-bold text-white tracking-wide">
               TAG<span className="text-brand-500">MAP</span>
