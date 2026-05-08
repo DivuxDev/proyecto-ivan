@@ -336,11 +336,17 @@ reset_database() {
     
     check_directories
     
+    # Cargar credenciales del .env si existe
+    if [ -f .env ]; then
+        export $(grep -v '^#' .env | xargs)
+        print_info "Credenciales cargadas desde .env"
+    fi
+    
     # Hacer backup de la BD actual
     print_info "Haciendo backup de la base de datos actual..."
     BACKUP_SQL="backup_db_$(date +%Y%m%d_%H%M%S).sql"
     
-    docker compose -f "$DOCKER_COMPOSE_FILE" exec -T db pg_dump -U tagmap_user tagmap_db > "$BACKUP_SQL" 2>/dev/null || {
+    docker compose -f "$DOCKER_COMPOSE_FILE" exec -T db pg_dump -U ${POSTGRES_USER:-tagmap_user} ${POSTGRES_DB:-tagmap_db} > "$BACKUP_SQL" 2>/dev/null || {
         print_warning "No se pudo hacer backup (¿base de datos vacía?)"
     }
     
@@ -368,12 +374,13 @@ reset_database() {
     
     # Inicializar PostgreSQL con permisos correctos
     print_info "Inicializando PostgreSQL..."
+    print_info "Usuario: ${POSTGRES_USER:-tagmap_user} | DB: ${POSTGRES_DB:-tagmap_db}"
     docker run --rm -d \
       --name temp_postgres_init \
       -v tagmap_postgres_data:/var/lib/postgresql/data \
-      -e POSTGRES_USER=tagmap_user \
+      -e POSTGRES_USER=${POSTGRES_USER:-tagmap_user} \
       -e POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-tagmap_pass} \
-      -e POSTGRES_DB=tagmap_db \
+      -e POSTGRES_DB=${POSTGRES_DB:-tagmap_db} \
       -e PGDATA=/var/lib/postgresql/data/pgdata \
       postgres:16-alpine
     
