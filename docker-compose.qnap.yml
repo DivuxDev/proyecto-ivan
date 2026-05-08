@@ -11,12 +11,15 @@ services:
     image: postgres:16-alpine
     container_name: tagmap_db
     restart: unless-stopped
+    user: "999:999"  # Usuario postgres estándar
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-tagmap_user}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-tagmap_pass}
       POSTGRES_DB: ${POSTGRES_DB:-tagmap_db}
+      PGDATA: /var/lib/postgresql/data/pgdata
     volumes:
       # Datos de PostgreSQL se guardan en un volumen nombrado
+      # Usamos subdirectorio pgdata para evitar conflictos de permisos
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-tagmap_user} -d ${POSTGRES_DB:-tagmap_db}"]

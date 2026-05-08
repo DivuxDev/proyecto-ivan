@@ -361,9 +361,35 @@ reset_database() {
     
     echo ""
     
-    # Reconstruir y levantar contenedores con base de datos limpia
-    print_info "Reconstruyendo y levantando contenedores..."
-    docker compose -f "$DOCKER_COMPOSE_FILE" up -d --build
+    # Recrear volumen con permisos correctos
+    print_info "Recreando volumen de PostgreSQL con permisos correctos..."
+    docker volume create tagmap_postgres_data
+    print_success "Volumen creado"
+    
+    # Inicializar PostgreSQL con permisos correctos
+    print_info "Inicializando PostgreSQL..."
+    docker run --rm -d \
+      --name temp_postgres_init \
+      -v tagmap_postgres_data:/var/lib/postgresql/data \
+      -e POSTGRES_USER=tagmap_user \
+      -e POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-tagmap_pass} \
+      -e POSTGRES_DB=tagmap_db \
+      -e PGDATA=/var/lib/postgresql/data/pgdata \
+      postgres:16-alpine
+    
+    # Esperar inicialización
+    print_info "Esperando inicialización de PostgreSQL (30s)..."
+    sleep 30
+    
+    # Detener contenedor temporal
+    docker stop temp_postgres_init 2>/dev/null || true
+    print_success "PostgreSQL inicializado"
+    
+    echo ""
+    
+    # Levantar contenedores con base de datos limpia
+    print_info "Levantando contenedores..."
+    docker compose -f "$DOCKER_COMPOSE_FILE" up -d
     
     # Esperar PostgreSQL
     wait_for_postgres
@@ -387,9 +413,13 @@ reset_database() {
     echo ""
     
     # Sincronizar fotos desde el NAS
-    print_info "Sincronizando fotos desde el NAS..."
+    print_info "Preparando sincronización de fotos..."
     echo ""
     
+    # Restaurar fotos de carpetas procesadas
+    restore_processed_photos
+    
+    # Sincronizar fotos
     sync_photos_from_nas
     
     echo ""
@@ -407,6 +437,86 @@ reset_database() {
 # ============================================================
 # Función auxiliar: Sincronizar fotos desde NAS
 # ============================================================
+
+restore_processed_photos() {
+    print_info "Buscando fotos en carpetas 'procesadas/'..."
+    echo ""
+    
+    if [ ! -d "$IMAGES_ORIGINAL" ]; then
+        print_error "Carpeta $IMAGES_ORIGINAL no existe"
+        return
+    fi
+    
+    # Contar fotos primero
+    TOTAL_TO_RESTORE=0
+    
+    for team_folder in "$IMAGES_ORIGINAL"/*; do
+        if [ -d "$team_folder" ]; then
+            team_name=$(basename "$team_folder")
+            processed_folder="$team_folder/procesadas"
+            
+            if [ -d "$processed_folder" ]; then
+                photo_count=$(find "$processed_folder" -maxdepth 1 -type f \( -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" \) 2>/dev/null | wc -l)
+                
+                if [ $photo_count -gt 0 ]; then
+                    echo -e "  ${CYAN}📁 $team_name/procesadas${NC}: $photo_count fotos"
+                    TOTAL_TO_RESTORE=$((TOTAL_TO_RESTORE + photo_count))
+                fi
+            fi
+        fi
+    done
+    
+    echo ""
+    
+    if [ $TOTAL_TO_RESTORE -eq 0 ]; then
+        print_info "No hay fotos en carpetas 'procesadas/' para restaurar"
+        echo ""
+        return
+    fi
+    
+    print_warning "Se encontraron $TOTAL_TO_RESTORE fotos en carpetas 'procesadas/'"
+    echo ""
+    echo "Estas fotos serán movidas de vuelta al directorio raíz de cada equipo"
+    echo "para que el Folder Watcher las reimporte a la nueva base de datos."
+    echo ""
+    
+    read -p "¿Deseas restaurar estas fotos? (s/n): " -n 1 -r
+    echo ""
+    
+    if [[ ! $REPLY =~ ^[SsYy]$ ]]; then
+        print_warning "Restauración cancelada - las fotos permanecen en 'procesadas/'"
+        print_info "Puedes importarlas manualmente más tarde"
+        echo ""
+        return
+    fi
+    
+    echo ""
+    print_info "Restaurando fotos..."
+    
+    RESTORED_COUNT=0
+    
+    for team_folder in "$IMAGES_ORIGINAL"/*; do
+        if [ -d "$team_folder" ]; then
+            team_name=$(basename "$team_folder")
+            processed_folder="$team_folder/procesadas"
+            
+            if [ -d "$processed_folder" ]; then
+                photo_count=$(find "$processed_folder" -maxdepth 1 -type f \( -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" \) 2>/dev/null | wc -l)
+                
+                if [ $photo_count -gt 0 ]; then
+                    echo -e "  ${CYAN}Moviendo $photo_count fotos de $team_name/procesadas/${NC}"
+                    find "$processed_folder" -maxdepth 1 -type f \( -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" \) -exec mv {} "$team_folder/" \; 2>/dev/null
+                    RESTORED_COUNT=$((RESTORED_COUNT + photo_count))
+                fi
+            fi
+        fi
+    done
+    
+    echo ""
+    print_success "Total de fotos restauradas: $RESTORED_COUNT"
+    print_info "El Folder Watcher las reimportará automáticamente"
+    echo ""
+}
 
 sync_photos_from_nas() {
     print_info "Escaneando carpetas de equipos en: $IMAGES_ORIGINAL"
