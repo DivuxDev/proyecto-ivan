@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { photosApi, usersApi, statsApi } from '@/lib/api';
 import { formatDate, formatCoords, formatBytes, getPhotoSrc } from '@/lib/utils';
 import {
@@ -23,6 +24,8 @@ import {
   Camera,
   Gauge,
   Navigation,
+  CheckCircle2,
+  Circle,
 } from 'lucide-react';
 import Image from 'next/image';
 import type { Photo, PaginatedPhotos, User, WorkerStats } from '@/types';
@@ -30,6 +33,10 @@ import { downloadBlob } from '@/lib/utils';
 
 export default function PhotosPage() {
   const qc = useQueryClient();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const photoIdParam = searchParams.get('photoId');
+
   const [page, setPage] = useState(1);
   const [userId, setUserId] = useState('');
   const [startDate, setStartDate] = useState('');
@@ -37,6 +44,7 @@ export default function PhotosPage() {
   const [selectedPhoto, setSelectedPhoto] = useState<Photo | null>(null);
   const [showDateFilter, setShowDateFilter] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [selectedPhotos, setSelectedPhotos] = useState<Set<string>>(new Set());
 
   // Workers con conteo de fotos (para los chips)
   const { data: workerStats } = useQuery({
@@ -79,6 +87,44 @@ export default function PhotosPage() {
       setSelectedPhoto(null);
     },
   });
+
+  // Abrir modal automáticamente si hay photoId en URL
+  useEffect(() => {
+    if (photoIdParam && data?.data) {
+      const photo = data.data.find(p => p.id === photoIdParam);
+      if (photo) {
+        setSelectedPhoto(photo);
+        // Limpiar parámetro de URL
+        router.replace('/dashboard/photos', { scroll: false });
+      }
+    }
+  }, [photoIdParam, data, router]);
+
+  const togglePhotoSelection = (photoId: string) => {
+    setSelectedPhotos(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(photoId)) {
+        newSet.delete(photoId);
+      } else {
+        newSet.add(photoId);
+      }
+      return newSet;
+    });
+  };
+
+  const downloadSelectedPhotos = async () => {
+    const selected = photos.filter(p => selectedPhotos.has(p.id));
+    for (const photo of selected) {
+      const link = document.createElement('a');
+      link.href = getPhotoSrc(photo.url);
+      link.download = photo.filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      // Pequeña pausa entre descargas
+      await new Promise(resolve => setTimeout(resolve, 300));
+    }
+  };
 
   const selectWorker = (id: string) => {
     setUserId(prev => (prev === id ? '' : id));
@@ -127,28 +173,66 @@ export default function PhotosPage() {
             {selectedWorkerName ? `Fotos de ${selectedWorkerName}` : 'Fotos de campo'}
           </h1>
           <p className="text-navy-300 text-sm">
-            {pagination ? `${pagination.total} fotos encontradas` : 'Todas las fotos subidas'}
+            {selectedPhotos.size > 0 
+              ? `${selectedPhotos.size} fotos seleccionadas`
+              : pagination 
+              ? `${pagination.total} fotos encontradas` 
+              : 'Todas las fotos subidas'
+            }
           </p>
         </div>
         <div className="flex gap-2 self-start sm:self-auto">
-          <button
-            onClick={handleExport}
-            className="flex items-center gap-2 border border-navy-500 text-navy-200 hover:text-white hover:border-navy-400 px-3 py-2 rounded-xl text-sm font-medium transition-colors"
-          >
-            <Download className="w-4 h-4" />
-            Excel
-          </button>
-          <button
-            onClick={() => setShowDateFilter(v => !v)}
-            className={`flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium transition-colors ${
-              showDateFilter || startDate || endDate
-                ? 'bg-brand-500 text-white'
-                : 'border border-navy-500 text-navy-200 hover:text-white'
-            }`}
-          >
-            <SlidersHorizontal className="w-4 h-4" />
-            Fecha {(startDate || endDate) && '•'}
-          </button>
+          {selectedPhotos.size > 0 ? (
+            <>
+              <button
+                onClick={() => setSelectedPhotos(new Set())}
+                className="flex items-center gap-2 border border-navy-500 text-navy-200 hover:text-white hover:border-navy-400 px-3 py-2 rounded-xl text-sm font-medium transition-colors"
+              >
+                <X className="w-4 h-4" />
+                Cancelar
+              </button>
+              <button
+                onClick={downloadSelectedPhotos}
+                className="flex items-center gap-2 bg-brand-500 hover:bg-brand-600 text-white px-4 py-2 rounded-xl text-sm font-medium transition-colors shadow-lg shadow-brand-500/20"
+              >
+                <Download className="w-4 h-4" />
+                Descargar ({selectedPhotos.size})
+              </button>
+            </>
+          ) : (
+            <>
+              <button
+                onClick={() => {
+                  if (photos.length > 0) {
+                    setSelectedPhotos(new Set(photos.map(p => p.id)));
+                  }
+                }}
+                className="flex items-center gap-2 border border-navy-500 text-navy-200 hover:text-white hover:border-navy-400 px-3 py-2 rounded-xl text-sm font-medium transition-colors"
+                disabled={photos.length === 0}
+              >
+                <CheckCircle2 className="w-4 h-4" />
+                Seleccionar
+              </button>
+              <button
+                onClick={handleExport}
+                className="flex items-center gap-2 border border-navy-500 text-navy-200 hover:text-white hover:border-navy-400 px-3 py-2 rounded-xl text-sm font-medium transition-colors"
+              >
+                <Download className="w-4 h-4" />
+                Excel
+              </button>
+              <button
+                onClick={() => setShowDateFilter(v => !v)}
+                className={`flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium transition-colors ${
+                  showDateFilter || startDate || endDate
+                    ? 'bg-brand-500 text-white'
+                    : 'border border-navy-500 text-navy-200 hover:text-white'
+                }`}
+              >
+                <SlidersHorizontal className="w-4 h-4" />
+                Fecha {(startDate || endDate) && '•'}
+              </button>
+            </>
+          )}
         </div>
       </div>
 
@@ -256,39 +340,76 @@ export default function PhotosPage() {
       ) : (
         <>
           <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
-            {photos.map((photo: Photo) => (
-              <button
-                key={photo.id}
-                onClick={() => setSelectedPhoto(photo)}
-                className="relative aspect-square photo-item group"
-              >
-                <Image
-                  src={getPhotoSrc(photo.url)}
-                  alt="Foto de campo"
-                  fill
-                  unoptimized
-                  className="object-cover rounded-xl"
-                  sizes="(max-width: 1024px) 25vw, 16vw"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-xl flex flex-col justify-end p-2">
-                  <p className="text-white text-xs font-medium truncate">{photo.user.name}</p>
-                  <div className="flex items-center gap-2 mt-0.5">
-                    {photo.latitude && (
-                      <div className="flex items-center gap-0.5">
-                        <MapPin className="w-2.5 h-2.5 text-green-400" />
-                        <span className="text-green-300 text-[10px]">GPS</span>
+            {photos.map((photo: Photo) => {
+              const isSelected = selectedPhotos.has(photo.id);
+              const selectionMode = selectedPhotos.size > 0;
+
+              return (
+                <div key={photo.id} className="relative">
+                  <button
+                    onClick={() => selectionMode ? togglePhotoSelection(photo.id) : setSelectedPhoto(photo)}
+                    className="relative aspect-square photo-item group w-full"
+                  >
+                    <Image
+                      src={getPhotoSrc(photo.url)}
+                      alt="Foto de campo"
+                      fill
+                      unoptimized
+                      className="object-cover rounded-xl"
+                      sizes="(max-width: 1024px) 25vw, 16vw"
+                    />
+                    
+                    {/* Checkbox overlay */}
+                    {selectionMode && (
+                      <div className={`absolute inset-0 flex items-center justify-center rounded-xl transition-all ${
+                        isSelected ? 'bg-brand-500/40 backdrop-blur-[1px]' : 'bg-black/20 backdrop-blur-[1px] opacity-0 group-hover:opacity-100'
+                      }`}>
+                        {isSelected ? (
+                          <CheckCircle2 className="w-10 h-10 text-white" strokeWidth={2.5} />
+                        ) : (
+                          <Circle className="w-10 h-10 text-white/80" strokeWidth={2} />
+                        )}
                       </div>
                     )}
-                    {photo.takenAt && (
-                      <div className="flex items-center gap-0.5">
-                        <Clock className="w-2.5 h-2.5 text-brand-400" />
-                        <span className="text-brand-300 text-[10px]">EXIF</span>
+
+                    {/* Info overlay (solo cuando NO está en modo selección) */}
+                    {!selectionMode && (
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-xl flex flex-col justify-end p-2">
+                        <p className="text-white text-xs font-medium truncate">{photo.user.name}</p>
+                        <div className="flex items-center gap-2 mt-0.5">
+                          {photo.latitude && (
+                            <div className="flex items-center gap-0.5">
+                              <MapPin className="w-2.5 h-2.5 text-green-400" />
+                              <span className="text-green-300 text-[10px]">GPS</span>
+                            </div>
+                          )}
+                          {photo.takenAt && (
+                            <div className="flex items-center gap-0.5">
+                              <Clock className="w-2.5 h-2.5 text-brand-400" />
+                              <span className="text-brand-300 text-[10px]">EXIF</span>
+                            </div>
+                          )}
+                        </div>
                       </div>
                     )}
-                  </div>
+                  </button>
+
+                  {/* Botón de selección individual (siempre visible en esquina) */}
+                  {!selectionMode && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        togglePhotoSelection(photo.id);
+                      }}
+                      className="absolute top-2 right-2 w-6 h-6 bg-black/60 backdrop-blur-sm rounded-full flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity z-10 hover:bg-black/80"
+                      title="Seleccionar foto"
+                    >
+                      <Circle className="w-3.5 h-3.5" strokeWidth={2} />
+                    </button>
+                  )}
                 </div>
-              </button>
-            ))}
+              );
+            })}
           </div>
 
           {pagination && pagination.totalPages > 1 && (

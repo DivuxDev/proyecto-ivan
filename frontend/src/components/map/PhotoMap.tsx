@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 import type { MapPhoto } from '@/types';
 import { getPhotoSrc } from '@/lib/utils';
 
@@ -10,6 +11,7 @@ interface Props {
 
 // Importamos Leaflet solo en cliente
 export default function PhotoMap({ photos }: Props) {
+  const router = useRouter();
   const mapRef = useRef<HTMLDivElement>(null);
   const leafletMapRef = useRef<ReturnType<typeof import('leaflet')['map']> | null>(null);
 
@@ -28,6 +30,11 @@ export default function PhotoMap({ photos }: Props) {
       iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
       shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
     });
+
+    // Función global para navegación desde popup
+    (window as unknown as { navigateToPhoto: (id: string) => void }).navigateToPhoto = (photoId: string) => {
+      router.push(`/dashboard/photos?photoId=${photoId}`);
+    };
 
     // Icono personalizado (amber)
     const amberIcon = L.divIcon({
@@ -66,6 +73,12 @@ export default function PhotoMap({ photos }: Props) {
             <p style="font-weight:600;color:#1E293B;margin:0 0 2px;">${photo.user.name}</p>
             <p style="color:#64748B;font-size:11px;margin:0;">${(() => { const d = new Date(photo.takenAt || photo.createdAt); return isNaN(d.getTime()) ? '—' : d.toLocaleDateString('es-ES'); })()}</p>
             ${photo.notes ? `<p style="color:#475569;font-size:12px;margin:4px 0 0;">${photo.notes}</p>` : ''}
+            <button 
+              onclick="window.navigateToPhoto('${photo.id}')" 
+              style="margin-top:8px;width:100%;padding:6px;background:#F59E0B;color:white;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;"
+            >
+              Ver foto completa
+            </button>
           </div>
         `, {
           maxWidth: 200,
@@ -87,7 +100,7 @@ export default function PhotoMap({ photos }: Props) {
       map.remove();
       leafletMapRef.current = null;
     };
-  }, []);
+  }, [router]);
 
   // Actualizar marcadores cuando cambian los datos
   useEffect(() => {
@@ -125,6 +138,12 @@ export default function PhotoMap({ photos }: Props) {
             <p style="font-weight:600;color:#1E293B;margin:0 0 2px;">${photo.user.name}</p>
             <p style="color:#64748B;font-size:11px;margin:0;">${(() => { const d = new Date(photo.takenAt || photo.createdAt); return isNaN(d.getTime()) ? '—' : d.toLocaleDateString('es-ES'); })()}</p>
             ${photo.notes ? `<p style="color:#475569;font-size:12px;margin:4px 0 0;">${photo.notes}</p>` : ''}
+            <button 
+              onclick="window.navigateToPhoto('${photo.id}')" 
+              style="margin-top:8px;width:100%;padding:6px;background:#F59E0B;color:white;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;"
+            >
+              Ver foto completa
+            </button>
           </div>
         `)
         .addTo(map);
