@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { authenticate, requireAdmin } from '../middleware/auth.middleware';
+import { authenticate, requireAdminOrWorker } from '../middleware/auth.middleware';
 import {
   getOverview,
   getActivity,
@@ -9,8 +9,8 @@ import {
 
 const router = Router();
 
-// Estadísticas sólo para admin
-router.use(authenticate, requireAdmin);
+// Estadísticas para admin y worker
+router.use(authenticate, requireAdminOrWorker);
 
 router.get('/overview', getOverview);
 router.get('/activity', getActivity);

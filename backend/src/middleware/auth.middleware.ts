@@ -35,6 +35,18 @@ export function requireAdmin(req: AuthRequest, res: Response, next: NextFunction
 }
 
 /**
+ * Middleware: permite acceso a administradores y trabajadores (consulta/gestión completa)
+ * Excluye gestión de usuarios que sigue siendo solo para ADMIN
+ */
+export function requireAdminOrWorker(req: AuthRequest, res: Response, next: NextFunction): void {
+  if (!req.user || (req.user.role !== 'ADMIN' && req.user.role !== 'WORKER')) {
+    res.status(403).json({ success: false, error: 'Acceso restringido' });
+    return;
+  }
+  next();
+}
+
+/**
  * Middleware: permite acceso al propio usuario o a administradores
  */
 export function requireSelfOrAdmin(userIdParam = 'id') {

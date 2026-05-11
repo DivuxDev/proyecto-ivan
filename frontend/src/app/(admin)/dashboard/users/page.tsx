@@ -7,6 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { usersApi } from '@/lib/api';
 import { formatDate, getErrorMessage } from '@/lib/utils';
+import { useAuth } from '@/hooks/useAuth';
 import {
   UserPlus,
   Search,
@@ -49,6 +50,7 @@ type PasswordForm = z.infer<typeof passwordSchema>;
 
 export default function UsersPage() {
   const qc = useQueryClient();
+  const { user: currentUser } = useAuth();
   const [search, setSearch] = useState('');
   const [showCreate, setShowCreate] = useState(false);
   const [editUser, setEditUser] = useState<User | null>(null);
@@ -57,6 +59,12 @@ export default function UsersPage() {
   const [formError, setFormError] = useState('');
   const [editError, setEditError] = useState('');
   const [passwordError, setPasswordError] = useState('');
+
+  // Verificar si un usuario es interno (auto-generado por folder watcher)
+  const isInternalUser = (user: User) => user.email.endsWith('@tagmap.internal');
+  
+  // Solo ADMIN puede crear usuarios
+  const canCreateUsers = currentUser?.role === 'ADMIN';
 
   const { data, isLoading } = useQuery({
     queryKey: ['admin-users'],
@@ -159,13 +167,15 @@ export default function UsersPage() {
           <h1 className="font-display text-2xl sm:text-3xl font-bold text-white mb-1">Trabajadores</h1>
           <p className="text-navy-300 text-sm">Gestión de usuarios y accesos</p>
         </div>
-        <button
-          onClick={() => { setShowCreate(true); setFormError(''); reset(); }}
-          className="self-start sm:self-auto flex items-center gap-2 bg-brand-500 hover:bg-brand-600 text-white px-4 py-2.5 rounded-xl text-sm font-medium transition-colors"
-        >
-          <UserPlus className="w-4 h-4" />
-          Nuevo usuario
-        </button>
+        {canCreateUsers && (
+          <button
+            onClick={() => { setShowCreate(true); setFormError(''); reset(); }}
+            className="self-start sm:self-auto flex items-center gap-2 bg-brand-500 hover:bg-brand-600 text-white px-4 py-2.5 rounded-xl text-sm font-medium transition-colors"
+          >
+            <UserPlus className="w-4 h-4" />
+            Nuevo usuario
+          </button>
+        )}
       </div>
 
       {/* Buscador */}
@@ -254,28 +264,32 @@ export default function UsersPage() {
                     </td>
                     <td className="py-3.5">
                       <div className="flex items-center justify-end gap-1">
-                        {/* Acciones deshabilitadas por solicitud del usuario */}
-                        {/* <button
-                          onClick={() => openEdit(user)}
-                          className="p-1.5 text-navy-300 hover:text-white hover:bg-navy-500 rounded-lg transition-colors"
-                          title="Editar usuario"
-                        >
-                          <Pencil className="w-3.5 h-3.5" />
-                        </button>
-                        <button
-                          onClick={() => openPassword(user)}
-                          className="p-1.5 text-navy-300 hover:text-brand-400 hover:bg-brand-500/10 rounded-lg transition-colors"
-                          title="Cambiar contraseña"
-                        >
-                          <KeyRound className="w-3.5 h-3.5" />
-                        </button>
-                        <button
-                          onClick={() => setDeleteUser(user)}
-                          className="p-1.5 text-navy-300 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
-                          title="Desactivar"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button> */}
+                        {/* Solo ADMIN puede editar usuarios NO internos */}
+                        {canCreateUsers && !isInternalUser(user) && (
+                          <>
+                            <button
+                              onClick={() => openEdit(user)}
+                              className="p-1.5 text-navy-300 hover:text-white hover:bg-navy-500 rounded-lg transition-colors"
+                              title="Editar usuario"
+                            >
+                              <Pencil className="w-3.5 h-3.5" />
+                            </button>
+                            <button
+                              onClick={() => openPassword(user)}
+                              className="p-1.5 text-navy-300 hover:text-brand-400 hover:bg-brand-500/10 rounded-lg transition-colors"
+                              title="Cambiar contraseña"
+                            >
+                              <KeyRound className="w-3.5 h-3.5" />
+                            </button>
+                            <button
+                              onClick={() => setDeleteUser(user)}
+                              className="p-1.5 text-navy-300 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
+                              title="Desactivar"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </>
+                        )}
                       </div>
                     </td>
                   </tr>

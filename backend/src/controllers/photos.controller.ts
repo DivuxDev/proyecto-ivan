@@ -91,10 +91,8 @@ export async function listPhotos(req: AuthRequest, res: Response): Promise<void>
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const where: Record<string, any> = {};
 
-  // Trabajador sólo ve sus propias fotos
-  if (req.user?.role === 'WORKER') {
-    where.userId = req.user.userId;
-  } else if (userId) {
+  // ADMIN y WORKER ven todas las fotos, pueden filtrar por userId
+  if (userId) {
     where.userId = userId;
   }
 
@@ -140,11 +138,7 @@ export async function getPhoto(req: AuthRequest, res: Response): Promise<void> {
     throw new AppError(404, 'Foto no encontrada');
   }
 
-  // Trabajador sólo puede ver sus propias fotos
-  if (req.user?.role === 'WORKER' && photo.userId !== req.user.userId) {
-    throw new AppError(403, 'Acceso denegado');
-  }
-
+  // ADMIN y WORKER pueden ver cualquier foto
   res.json({ success: true, data: photo });
 }
 
@@ -176,9 +170,8 @@ export async function getPhotosForMap(req: AuthRequest, res: Response): Promise<
     longitude: { not: null },
   };
 
-  if (req.user?.role === 'WORKER') {
-    where.userId = req.user.userId;
-  } else if (userId) {
+  // ADMIN y WORKER ven todas las fotos, pueden filtrar por userId
+  if (userId) {
     where.userId = userId;
   }
 

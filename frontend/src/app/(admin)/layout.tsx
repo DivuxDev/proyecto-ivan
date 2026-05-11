@@ -18,14 +18,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       router.replace('/login');
       return;
     }
-    if (user.role !== 'ADMIN') {
-      router.replace('/worker');
+    // Permitir acceso a ADMIN y WORKER
+    // WORKER tiene permisos de consulta y gestión completa excepto crear usuarios
+    if (user.role !== 'ADMIN' && user.role !== 'WORKER') {
+      router.replace('/login');
     }
   }, [mounted, isAuthenticated, user, router]);
 
   if (!mounted) return null;
 
-  if (!isAuthenticated || !user || user.role !== 'ADMIN') {
+  if (!isAuthenticated || !user || (user.role !== 'ADMIN' && user.role !== 'WORKER')) {
     return null;
   }
 

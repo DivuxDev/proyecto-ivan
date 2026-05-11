@@ -20,11 +20,9 @@ export default function RootPage() {
       return;
     }
 
-    if (user.role === 'ADMIN') {
-      router.replace('/dashboard');
-    } else {
-      router.replace('/worker');
-    }
+    // Tanto ADMIN como WORKER van al dashboard
+    // WORKER tiene acceso de solo lectura/gestión, no puede crear usuarios ni subir fotos
+    router.replace('/dashboard');
   }, [mounted, isAuthenticated, user, router]);
 
   return (

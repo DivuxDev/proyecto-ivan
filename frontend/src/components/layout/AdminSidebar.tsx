@@ -43,7 +43,9 @@ export default function AdminSidebar() {
             <p className="font-display text-base font-bold text-white tracking-wide">
               TAG<span className="text-brand-500">MAP</span>
             </p>
-            <p className="text-navy-400 text-[10px] tracking-widest uppercase">Admin Panel</p>
+            <p className="text-navy-400 text-[10px] tracking-widest uppercase">
+              {user?.role === 'ADMIN' ? 'Admin Panel' : 'Visor'}
+            </p>
           </div>
         </div>
       </div>
