@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { authenticate, requireAdmin } from '../middleware/auth.middleware';
+import { authenticate, requireAdmin, requireAdminOrWorker } from '../middleware/auth.middleware';
 import {
   listUsers,
   createUser,
@@ -11,13 +11,16 @@ import {
 
 const router = Router();
 
-// Todas las rutas de usuarios requieren autenticación + rol admin
-router.use(authenticate, requireAdmin);
+// Todas las rutas requieren autenticación
+router.use(authenticate);
 
-router.get('/', listUsers);
-router.post('/', createUserValidators, createUser);
-router.put('/:id', updateUser);
-router.delete('/:id', deleteUser);
-router.put('/:id/password', changePassword);
+// Ver usuarios: ADMIN y WORKER
+router.get('/', requireAdminOrWorker, listUsers);
+
+// Gestionar usuarios: solo ADMIN
+router.post('/', requireAdmin, createUserValidators, createUser);
+router.put('/:id', requireAdmin, updateUser);
+router.delete('/:id', requireAdmin, deleteUser);
+router.put('/:id/password', requireAdmin, changePassword);
 
 export default router;
