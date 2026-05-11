@@ -254,7 +254,8 @@ export default function UsersPage() {
                     </td>
                     <td className="py-3.5">
                       <div className="flex items-center justify-end gap-1">
-                        <button
+                        {/* Acciones deshabilitadas por solicitud del usuario */}
+                        {/* <button
                           onClick={() => openEdit(user)}
                           className="p-1.5 text-navy-300 hover:text-white hover:bg-navy-500 rounded-lg transition-colors"
                           title="Editar usuario"
@@ -274,7 +275,7 @@ export default function UsersPage() {
                           title="Desactivar"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
-                        </button>
+                        </button> */}
                       </div>
                     </td>
                   </tr>

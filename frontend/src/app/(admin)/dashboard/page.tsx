@@ -201,7 +201,7 @@ export default function DashboardPage() {
             <tbody className="divide-y divide-navy-600">
               {(workerStats ?? []).map((worker: WorkerStats) => (
                 <tr key={worker.userId} className="hover:bg-navy-600/30 transition-colors">
-                  <td className="py-3 text-white font-medium">{worker.userName}</td>
+                  <td className="py-3 text-white font-medium">{worker.userName.split(' ')[0]}</td>
                   <td className="py-3 text-right">
                     <span className="font-display text-lg text-brand-400 font-bold">
                       {worker.totalPhotos}

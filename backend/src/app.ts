@@ -30,20 +30,22 @@ app.use(
   })
 );
 
-// Rate limiting general
-const generalLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutos
-  max: 300,
-  standardHeaders: true,
-  legacyHeaders: false,
-  message: { success: false, error: 'Demasiadas solicitudes, intenta más tarde' },
-});
-app.use(generalLimiter);
+// Rate limiting general (solo en producción)
+if (process.env.NODE_ENV === 'production') {
+  const generalLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutos
+    max: 8000, // Aumentado para soportar más carga
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { success: false, error: 'Demasiadas solicitudes, intenta más tarde' },
+  });
+  app.use(generalLimiter);
+}
 
 // Rate limiting estricto para autenticación (prevenir fuerza bruta)
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 20,
+  max: 40,
   message: { success: false, error: 'Demasiados intentos de login, espera 15 minutos' },
 });
 app.use('/api/auth/login', authLimiter);
