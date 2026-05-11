@@ -8,10 +8,10 @@ async function main() {
 
   const adminPassword = await bcrypt.hash('@dminServitec2026.', 12);
 
-  // Administrador
+  // Administrador (actualiza contraseña en cada seed)
   const admin = await prisma.user.upsert({
     where: { email: 'admin@tagmap.app' },
-    update: {},
+    update: { password: adminPassword },
     create: {
       name: 'Administrador',
       email: 'admin@tagmap.app',
