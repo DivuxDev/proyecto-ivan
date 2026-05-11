@@ -90,12 +90,24 @@ export default function PhotosPage() {
 
   // Abrir modal automáticamente si hay photoId en URL
   useEffect(() => {
-    if (photoIdParam && data?.data) {
-      const photo = data.data.find(p => p.id === photoIdParam);
+    if (photoIdParam) {
+      // Primero buscar en los datos actuales
+      const photo = data?.data?.find(p => p.id === photoIdParam);
       if (photo) {
         setSelectedPhoto(photo);
         // Limpiar parámetro de URL
         router.replace('/dashboard/photos', { scroll: false });
+      } else {
+        // Si no está en la página actual, hacer petición directa
+        photosApi.getById(photoIdParam)
+          .then(res => {
+            setSelectedPhoto(res.data.data as Photo);
+            router.replace('/dashboard/photos', { scroll: false });
+          })
+          .catch(() => {
+            // Si la foto no existe, limpiar parámetro
+            router.replace('/dashboard/photos', { scroll: false });
+          });
       }
     }
   }, [photoIdParam, data, router]);

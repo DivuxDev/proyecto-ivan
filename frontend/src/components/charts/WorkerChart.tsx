@@ -70,7 +70,16 @@ export default function WorkerChart({ data }: Props) {
             tick={{ fill: '#9EB0C8', fontSize: 11 }}
             axisLine={false}
             tickLine={false}
-            tickFormatter={v => v.split(' ')[0]} // Sólo primer nombre
+            tickFormatter={(v: string) => {
+              // Si es un email, extraer la parte antes del @
+              if (v.includes('@')) {
+                const localPart = v.split('@')[0];
+                // Capitalizar primera letra
+                return localPart.charAt(0).toUpperCase() + localPart.slice(1);
+              }
+              // Si es un nombre normal, tomar solo la primera palabra
+              return v.split(' ')[0];
+            }}
           />
           <Tooltip content={<CustomTooltip />} cursor={{ fill: '#1E3A5F' }} />
           <Bar dataKey="totalPhotos" radius={[0, 6, 6, 0]} maxBarSize={20}>
