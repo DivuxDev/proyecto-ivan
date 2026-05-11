@@ -105,12 +105,15 @@ export async function getWorkerStats(_req: AuthRequest, res: Response): Promise<
     orderBy: { name: 'asc' },
   });
 
-  const stats = workers.map(worker => ({
-    userId: worker.id,
-    userName: worker.name,
-    totalPhotos: worker._count.photos,
-    lastActivity: worker.photos[0]?.createdAt ?? null,
-  }));
+  // Filtrar solo trabajadores con al menos 1 foto
+  const stats = workers
+    .filter(worker => worker._count.photos > 0)
+    .map(worker => ({
+      userId: worker.id,
+      userName: worker.name,
+      totalPhotos: worker._count.photos,
+      lastActivity: worker.photos[0]?.createdAt ?? null,
+    }));
 
   res.json({ success: true, data: stats });
 }
