@@ -33,7 +33,7 @@ async function main() {
     { email: 'yolandafernandez@servitecma.onmicrosoft.com', name: 'Yolanda Fernandez', password: '4Mw8DpL5vT' },
     { email: 'alvarogonzalezvega@servitecma.onmicrosoft.com', name: 'Alvaro Gonzalez Vega', password: '7Zy3RmK6nQ' },
     { email: 'yandymsuarezriera@servitecma.onmicrosoft.com', name: 'Yandym Suarez', password: '9Hv5WxJ2pL' },
-    { email: 'alvarogonzalezvega@servitecma.com', name: 'Alvaro Gonzalez (Alt)', password: '2Pq8NbT4mK' },
+    { email: 'alvarogonzalezvega@servitecma.com', name: 'Alvaro Gonzalez', password: '2Pq8NbT4mK' },
   ];
 
   let createdWorkers = 0;
