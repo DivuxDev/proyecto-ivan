@@ -35,12 +35,9 @@ export default function LoginPage() {
     setIsLoading(true);
     setServerError('');
     try {
-      const user = await login(data.email, data.password);
-      if (user.role === 'ADMIN') {
-        router.replace('/dashboard');
-      } else {
-        router.replace('/worker');
-      }
+      await login(data.email, data.password);
+      // Todos los usuarios (ADMIN y WORKER) van al dashboard
+      router.replace('/dashboard');
     } catch (err) {
       setServerError(getErrorMessage(err));
     } finally {
